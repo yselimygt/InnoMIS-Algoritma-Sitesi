@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $problem['title'] ?> - InnoMIS</title>
-    <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
+    <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 </head>
 <body>
@@ -18,9 +18,9 @@
                 <div class="content" style="margin-top: 20px;">
                     <?= nl2br($problem['description']) ?>
                 </div>
-                <h3>Input Format</h3>
+                <h3>Girdi Formatı</h3>
                 <pre><?= $problem['input_format'] ?></pre>
-                <h3>Output Format</h3>
+                <h3>Çıktı Formatı</h3>
                 <pre><?= $problem['output_format'] ?></pre>
             </div>
             
@@ -34,13 +34,13 @@
                 <div id="editor" style="height: 400px; width: 100%;"></div>
                 
                 <div style="margin-top: 10px;">
-                    <label>Custom Input:</label>
+                    <label>Özel Girdi:</label>
                     <textarea id="customInput" rows="3"></textarea>
                 </div>
                 
                 <div style="margin-top: 10px; display: flex; gap: 10px;">
-                    <button id="runBtn" onclick="runCode()" class="btn btn-secondary">Run with Custom Input</button>
-                    <button id="submitBtn" onclick="submitCode()" class="btn">Submit Code</button>
+                    <button id="runBtn" onclick="runCode()" class="btn btn-secondary">Çalıştır</button>
+                    <button id="submitBtn" onclick="submitCode()" class="btn">Gönder</button>
                 </div>
                 
                 <div id="result" style="margin-top: 10px; font-weight: bold;"></div>
@@ -67,7 +67,7 @@
             var language = document.getElementById('language').value;
             var slug = "<?= $problem['slug'] ?>";
 
-            document.getElementById('result').innerText = "Running...";
+            document.getElementById('result').innerText = "Çalışıyor...";
 
             fetch('<?= APP_URL ?>/api/submit', {
                 method: 'POST',
@@ -82,11 +82,11 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('result').innerText = "Result: " + data.result + " (Time: " + data.time + "s)";
+                document.getElementById('result').innerText = "Sonuç: " + data.result + " (Süre: " + data.time + "s)";
             })
             .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('result').innerText = "Error submitting code.";
+                console.error('Hata:', error);
+                document.getElementById('result').innerText = "Kod gönderilirken hata oluştu.";
             });
         }
 
@@ -95,7 +95,7 @@
             var language = document.getElementById('language').value;
             var input = document.getElementById('customInput').value;
 
-            document.getElementById('result').innerText = "Running...";
+            document.getElementById('result').innerText = "Çalışıyor...";
             document.getElementById('output').style.display = 'none';
 
             fetch('<?= APP_URL ?>/api/run-test', {
@@ -105,7 +105,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('result').innerText = "Status: " + data.status;
+                document.getElementById('result').innerText = "Durum: " + data.status;
                 document.getElementById('output').style.display = 'block';
                 document.getElementById('output').innerText = data.output;
             });

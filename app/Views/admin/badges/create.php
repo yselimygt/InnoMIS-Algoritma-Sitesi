@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Badge - Admin</title>
-    <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
+    <title>Rozet Oluştur - InnoMIS</title>
+    <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
 </head>
 <body>
     <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
 
     <div class="container">
-        <h1>Create Badge</h1>
+        <h1>Rozet Oluştur</h1>
         <div class="card">
-            <form action="<?= APP_URL ?>/admin/badges/store" method="POST" enctype="multipart/form-data">
-                <label>Name</label>
+            <form action="<?= APP_URL ?>/admin/badges/store" method="POST">
+                <label>Rozet Adı</label>
                 <input type="text" name="name" required>
                 
-                <label>Description</label>
+                <label>Açıklama</label>
                 <textarea name="description" rows="3" required></textarea>
                 
-                <label>Icon</label>
-                <input type="file" name="icon" required>
+                <label>İkon (Emoji)</label>
+                <input type="text" name="icon" placeholder="🏆" required>
                 
-                <button type="submit" class="btn">Create Badge</button>
+                <label>Kriter (JSON)</label>
+                <input type="text" name="criteria" placeholder='{"problems_solved": 10}' required>
+                
+                <button type="submit" class="btn">Rozet Oluştur</button>
             </form>
         </div>
     </div>

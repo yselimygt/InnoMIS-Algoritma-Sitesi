@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard - InnoMIS</title>
-    <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
+    <title>Liderlik Tablosu - InnoMIS</title>
+    <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
 </head>
 <body>
     <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
 
     <div class="container">
-        <h1>Leaderboard</h1>
+        <h1>Liderlik Tablosu</h1>
         <div class="card">
             <table>
                 <thead>
                     <tr>
-                        <th>Rank</th>
-                        <th>User</th>
-                        <th>Level</th>
+                        <th>Sıra</th>
+                        <th>Kullanıcı</th>
+                        <th>Seviye</th>
                         <th>XP</th>
                     </tr>
                 </thead>

@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - InnoMIS</title>
-    <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
+    <title>Yönetici Paneli - InnoMIS</title>
+    <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
 </head>
 <body>
-    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+    <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
 
     <div class="container">
-        <h1>Admin Dashboard</h1>
+        <h1>Yönetici Paneli</h1>
         
         <div class="grid">
             <div class="card">
-                <h3>User Management</h3>
-                <p>Manage users, assign roles.</p>
-                <a href="<?= APP_URL ?>/admin/users" class="btn">Manage Users</a>
+                <h3>Kullanıcılar</h3>
+                <p>Kullanıcıları ve rollerini yönet.</p>
+                <a href="<?= APP_URL ?>/admin/users" class="btn">Yönet</a>
             </div>
             
             <div class="card">
-                <h3>Badge Management</h3>
-                <p>Create and list badges.</p>
-                <a href="<?= APP_URL ?>/admin/badges" class="btn">Manage Badges</a>
+                <h3>Rozetler</h3>
+                <p>Yeni rozetler oluştur ve yönet.</p>
+                <a href="<?= APP_URL ?>/admin/badges" class="btn">Yönet</a>
             </div>
             
             <div class="card">
-                <h3>Tournament Management</h3>
-                <p>Create and manage tournaments.</p>
-                <a href="<?= APP_URL ?>/admin/tournaments" class="btn">Manage Tournaments</a>
+                <h3>Turnuvalar</h3>
+                <p>Turnuvaları oluştur ve yönet.</p>
+                <a href="<?= APP_URL ?>/admin/tournaments" class="btn">Yönet</a>
             </div>
         </div>
     </div>

@@ -3,29 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Tournament - Admin</title>
-    <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
+    <title>Turnuva Oluştur - InnoMIS</title>
+    <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
 </head>
 <body>
     <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
 
     <div class="container">
-        <h1>Create Tournament</h1>
+        <h1>Turnuva Oluştur</h1>
         <div class="card">
             <form action="<?= APP_URL ?>/admin/tournaments/store" method="POST">
-                <label>Title</label>
+                <label>Turnuva Başlığı</label>
                 <input type="text" name="title" required>
                 
-                <label>Description</label>
+                <label>Açıklama</label>
                 <textarea name="description" rows="3" required></textarea>
                 
-                <label>Start Time</label>
-                <input type="datetime-local" name="start_time" required>
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label>Başlangıç Zamanı</label>
+                        <input type="datetime-local" name="start_time" required>
+                    </div>
+                    <div>
+                        <label>Bitiş Zamanı</label>
+                        <input type="datetime-local" name="end_time" required>
+                    </div>
+                </div>
                 
-                <label>End Time</label>
-                <input type="datetime-local" name="end_time" required>
-                
-                <button type="submit" class="btn">Create Tournament</button>
+                <button type="submit" class="btn">Turnuva Oluştur</button>
             </form>
         </div>
     </div>
