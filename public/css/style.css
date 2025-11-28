@@ -1,3 +1,15 @@
+:root {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --text-color: #e2e8f0;
+  --primary-color: #22d3ee; /* Neon Blue */
+  --secondary-color: #22c55e; /* Neon Green */
+  --accent-color: #f472b6; /* Pink */
+  --border-color: #334155;
+}
+
+body {
+  background-color: var(--bg-color);
   color: var(--text-color);
   font-family: "Inter", sans-serif;
   margin: 0;
@@ -136,4 +148,42 @@ tr:hover {
   display: flex;
   gap: 10px;
   margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stats {
+    justify-content: center;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .badge-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
 }
