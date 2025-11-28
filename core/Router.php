@@ -20,9 +20,9 @@ class Router {
         }
 
         // Remove base path if running in subdirectory
-        $basePath = '/algoritma-sitesi';
-        if (strpos($path, $basePath) === 0) {
-            $path = substr($path, strlen($basePath));
+        $scriptName = dirname($_SERVER['SCRIPT_NAME']);
+        if (strpos($path, $scriptName) === 0) {
+            $path = substr($path, strlen($scriptName));
         }
         
         if ($path == '') {

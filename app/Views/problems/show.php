@@ -29,8 +29,19 @@
                 <option value="java">Java</option>
             </select>
             <div id="editor" style="height: 400px; width: 100%;"></div>
-            <button id="submitBtn" onclick="submitCode()">Submit Code</button>
-            <div id="result"></div>
+            
+            <div style="margin-top: 10px;">
+                <label>Custom Input:</label>
+                <textarea id="customInput" rows="3" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid #334155;"></textarea>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <button id="runBtn" onclick="runCode()" style="background-color: #4b5563; margin-right: 10px;">Run with Custom Input</button>
+                <button id="submitBtn" onclick="submitCode()">Submit Code</button>
+            </div>
+            
+            <div id="result" style="margin-top: 10px; font-weight: bold;"></div>
+            <pre id="output" style="background: #000; padding: 10px; display: none;"></pre>
         </div>
     </div>
 
@@ -72,6 +83,27 @@
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('result').innerText = "Error submitting code.";
+            });
+        }
+
+        function runCode() {
+            var code = editor.getValue();
+            var language = document.getElementById('language').value;
+            var input = document.getElementById('customInput').value;
+
+            document.getElementById('result').innerText = "Running...";
+            document.getElementById('output').style.display = 'none';
+
+            fetch('<?= APP_URL ?>/api/run-test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language: language, code: code, input: input })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = "Status: " + data.status;
+                document.getElementById('output').style.display = 'block';
+                document.getElementById('output').innerText = data.output;
             });
         }
     </script>

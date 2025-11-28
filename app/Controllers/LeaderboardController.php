@@ -8,4 +8,13 @@ class LeaderboardController extends Controller {
 
         $this->view('leaderboard/index', ['users' => $users]);
     }
+
+    public function api() {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->query("SELECT name, surname, xp, level, avatar FROM users ORDER BY xp DESC LIMIT 50");
+        $users = $stmt->fetchAll();
+        
+        header('Content-Type: application/json');
+        echo json_encode($users);
+    }
 }

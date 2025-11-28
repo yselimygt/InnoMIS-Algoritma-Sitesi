@@ -81,4 +81,18 @@ class ProblemController extends Controller {
 
         echo json_encode(['result' => $finalResult, 'time' => $maxTime]);
     }
+
+    public function runTest() {
+        header('Content-Type: application/json');
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        $language = $input['language'];
+        $code = $input['code'];
+        $customInput = $input['input'];
+        
+        $sandbox = new Sandbox();
+        $run = $sandbox->run($language, $code, $customInput);
+        
+        echo json_encode($run);
+    }
 }

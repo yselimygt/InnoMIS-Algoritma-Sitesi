@@ -30,5 +30,30 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        function updateLeaderboard() {
+            fetch('<?= APP_URL ?>/api/leaderboard')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = '';
+                    
+                    data.forEach((user, index) => {
+                        const row = `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${user.name} ${user.surname}</td>
+                                <td>${user.level}</td>
+                                <td>${user.xp}</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                });
+        }
+
+        setInterval(updateLeaderboard, 5000); // Refresh every 5 seconds
+    </script>
 </body>
 </html>

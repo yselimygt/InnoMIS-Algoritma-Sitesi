@@ -44,4 +44,15 @@ class UserModel {
         $stmt->execute(['id' => $id]);
         return $stmt->fetch();
     }
+
+    public function getAll() {
+        $stmt = $this->db->query("SELECT * FROM users ORDER BY id DESC");
+        return $stmt->fetchAll();
+    }
+
+    public function updateRole($userId, $role) {
+        $sql = "UPDATE users SET role = :role WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['role' => $role, 'id' => $userId]);
+    }
 }
