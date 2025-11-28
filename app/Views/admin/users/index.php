@@ -7,40 +7,38 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1>Manage Users</h1>
-            <a href="<?= APP_URL ?>/admin" class="btn">Back to Dashboard</a>
-        </div>
+    <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
 
+    <div class="container">
+        <h1>User Management</h1>
         <div class="card">
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
-                        <th>Actions</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($users as $user): ?>
                     <tr>
-                        <td><?= $user['id'] ?></td>
-                        <td><?= $user['name'] . ' ' . $user['surname'] ?></td>
-                        <td><?= $user['email'] ?></td>
+                        <td><?= htmlspecialchars($user['name'] . ' ' . $user['surname']) ?></td>
+                        <td><?= htmlspecialchars($user['email']) ?></td>
                         <td>
-                            <form action="<?= APP_URL ?>/admin/users/update-role" method="POST" style="display: inline;">
-                                <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                <select name="role" onchange="this.form.submit()" style="padding: 5px; background: #333; color: #fff; border: 1px solid #555;">
-                                    <option value="user" <?= $user['role'] == 'user' ? 'selected' : '' ?>>User</option>
-                                    <option value="admin" <?= $user['role'] == 'admin' ? 'selected' : '' ?>>Admin</option>
-                                </select>
-                            </form>
+                            <span class="badge <?= $user['role'] === 'admin' ? 'danger' : 'success' ?>">
+                                <?= ucfirst($user['role']) ?>
+                            </span>
                         </td>
                         <td>
-                            <!-- Add delete/edit buttons here if needed -->
+                            <form action="<?= APP_URL ?>/admin/users/update-role" method="POST" style="display:inline;">
+                                <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                <select name="role" onchange="this.form.submit()" style="width: auto; padding: 5px; margin: 0;">
+                                    <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
+                                    <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                                </select>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

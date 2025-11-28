@@ -7,28 +7,32 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
     <div class="container">
-        <h2>Leaderboard</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>User</th>
-                    <th>Level</th>
-                    <th>XP</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($users as $index => $user): ?>
-                <tr>
-                    <td><?= $index + 1 ?></td>
-                    <td><?= htmlspecialchars($user['name'] . ' ' . $user['surname']) ?></td>
-                    <td><?= $user['level'] ?></td>
-                    <td><?= $user['xp'] ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        <h1>Leaderboard</h1>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User</th>
+                        <th>Level</th>
+                        <th>XP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($users as $index => $user): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= htmlspecialchars($user['name'] . ' ' . $user['surname']) ?></td>
+                        <td><?= $user['level'] ?></td>
+                        <td><?= $user['xp'] ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>

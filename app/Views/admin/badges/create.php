@@ -7,18 +7,20 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
+
     <div class="container">
-        <h1>Create New Badge</h1>
+        <h1>Create Badge</h1>
         <div class="card">
             <form action="<?= APP_URL ?>/admin/badges/store" method="POST" enctype="multipart/form-data">
-                <label>Badge Name</label>
+                <label>Name</label>
                 <input type="text" name="name" required>
                 
                 <label>Description</label>
                 <textarea name="description" rows="3" required></textarea>
                 
-                <label>Icon (Image)</label>
-                <input type="file" name="icon" accept="image/*">
+                <label>Icon</label>
+                <input type="file" name="icon" required>
                 
                 <button type="submit" class="btn">Create Badge</button>
             </form>

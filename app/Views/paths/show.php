@@ -7,21 +7,26 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
     <div class="container">
-        <h1><?= $path['title'] ?></h1>
-        <p><?= $path['description'] ?></p>
-        
         <div class="card">
-            <h3>Curriculum</h3>
-            <ul>
-                <?php foreach ($steps as $step): ?>
-                <li style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 5px;">
-                    <strong>Step <?= $step['order_index'] ?>:</strong> 
-                    <a href="<?= APP_URL ?>/problem/<?= $step['slug'] ?>"><?= $step['title'] ?></a>
-                    <span class="badge" style="float: right;"><?= $step['difficulty'] ?></span>
-                </li>
-                <?php endforeach; ?>
-            </ul>
+            <h1><?= $path['title'] ?></h1>
+            <p><?= $path['description'] ?></p>
+        </div>
+
+        <h2>Steps</h2>
+        <div class="grid">
+            <?php foreach ($steps as $index => $step): ?>
+            <div class="card">
+                <h3>Step <?= $index + 1 ?>: <?= $step['title'] ?></h3>
+                <p><?= $step['description'] ?></p>
+                <div class="flex justify-between items-center">
+                    <span class="badge"><?= $step['difficulty'] ?></span>
+                    <a href="<?= APP_URL ?>/problem/<?= $step['slug'] ?>" class="btn btn-secondary">Solve Problem</a>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </body>

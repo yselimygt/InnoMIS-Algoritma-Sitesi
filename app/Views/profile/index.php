@@ -60,13 +60,15 @@
     </style>
 </head>
 <body>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
     <div class="container">
-        <div class="profile-header">
+        <div class="profile-header card" style="flex-direction: row; align-items: center; text-align: left;">
             <div class="avatar">
                 <?= strtoupper(substr($user['name'], 0, 1)) ?>
             </div>
-            <div>
-                <h1><?= $user['name'] . ' ' . $user['surname'] ?></h1>
+            <div style="flex: 1;">
+                <h1 style="margin: 0; font-size: 2rem;"><?= $user['name'] . ' ' . $user['surname'] ?></h1>
                 <p><?= $user['faculty'] ?> - <?= $user['department'] ?></p>
                 <div class="stats">
                     <div class="stat-box">

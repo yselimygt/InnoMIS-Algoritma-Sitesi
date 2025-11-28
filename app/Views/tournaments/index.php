@@ -7,31 +7,23 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
     <div class="container">
         <h1>Tournaments</h1>
-        <div class="card">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($tournaments as $t): ?>
-                    <tr>
-                        <td><?= $t['title'] ?></td>
-                        <td><?= $t['start_time'] ?></td>
-                        <td><?= $t['end_time'] ?></td>
-                        <td><?= $t['is_active'] ? 'Active' : 'Upcoming/Ended' ?></td>
-                        <td><a href="<?= APP_URL ?>/tournament/<?= $t['id'] ?>" class="btn">View</a></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <div class="grid">
+            <?php foreach ($tournaments as $t): ?>
+            <div class="card">
+                <h3><?= $t['title'] ?></h3>
+                <p><?= $t['description'] ?></p>
+                <div class="flex justify-between items-center" style="margin-top: 10px;">
+                    <span class="badge <?= $t['is_active'] ? 'success' : 'danger' ?>">
+                        <?= $t['is_active'] ? 'Active' : 'Ended' ?>
+                    </span>
+                    <a href="<?= APP_URL ?>/tournament/<?= $t['id'] ?>" class="btn btn-secondary">View Details</a>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </body>

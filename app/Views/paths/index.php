@@ -7,11 +7,13 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
     <div class="container">
         <h1>Learning Paths</h1>
-        <div class="badge-grid">
+        <div class="grid">
             <?php foreach ($paths as $path): ?>
-            <div class="card" style="text-align: center;">
+            <div class="card">
                 <h3><?= $path['title'] ?></h3>
                 <p><?= $path['description'] ?></p>
                 <span class="badge"><?= $path['level'] ?></span>

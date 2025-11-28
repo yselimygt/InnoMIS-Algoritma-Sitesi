@@ -7,36 +7,24 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
+
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1>Manage Badges</h1>
-            <div>
-                <a href="<?= APP_URL ?>/admin/badges/create" class="btn">Create New Badge</a>
-                <a href="<?= APP_URL ?>/admin" class="btn" style="background: #555;">Back</a>
-            </div>
+        <div class="flex justify-between items-center">
+            <h1>Badge Management</h1>
+            <a href="<?= APP_URL ?>/admin/badges/create" class="btn">Create New Badge</a>
         </div>
 
-        <div class="card">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Icon</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($badges as $badge): ?>
-                    <tr>
-                        <td>
-                            <img src="<?= APP_URL ?>/public/uploads/badges/<?= $badge['icon_path'] ?>" width="50" height="50" style="object-fit: contain;">
-                        </td>
-                        <td><?= $badge['name'] ?></td>
-                        <td><?= $badge['description'] ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <div class="grid">
+            <?php foreach ($badges as $badge): ?>
+            <div class="card flex items-center gap-4">
+                <img src="<?= APP_URL ?>/public/uploads/badges/<?= $badge['icon_path'] ?>" alt="<?= $badge['name'] ?>" style="width: 50px; height: 50px; object-fit: contain;">
+                <div>
+                    <h3><?= $badge['name'] ?></h3>
+                    <p><?= $badge['description'] ?></p>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </body>

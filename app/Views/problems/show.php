@@ -8,40 +8,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 </head>
 <body>
-    <div class="container problem-container">
-        <div class="problem-desc">
-            <h1><?= $problem['title'] ?></h1>
-            <span class="badge"><?= $problem['difficulty'] ?></span>
-            <div class="content">
-                <?= nl2br($problem['description']) ?>
-            </div>
-            <h3>Input Format</h3>
-            <pre><?= $problem['input_format'] ?></pre>
-            <h3>Output Format</h3>
-            <pre><?= $problem['output_format'] ?></pre>
-        </div>
-        
-        <div class="editor-container">
-            <select id="language">
-                <option value="c">C</option>
-                <option value="cpp">C++</option>
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-            </select>
-            <div id="editor" style="height: 400px; width: 100%;"></div>
-            
-            <div style="margin-top: 10px;">
-                <label>Custom Input:</label>
-                <textarea id="customInput" rows="3" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid #334155;"></textarea>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
+    <div class="container">
+        <div class="problem-container">
+            <div class="problem-desc card">
+                <h1><?= $problem['title'] ?></h1>
+                <div class="badge"><?= $problem['difficulty'] ?></div>
+                <div class="content" style="margin-top: 20px;">
+                    <?= nl2br($problem['description']) ?>
+                </div>
+                <h3>Input Format</h3>
+                <pre><?= $problem['input_format'] ?></pre>
+                <h3>Output Format</h3>
+                <pre><?= $problem['output_format'] ?></pre>
             </div>
             
-            <div style="margin-top: 10px;">
-                <button id="runBtn" onclick="runCode()" style="background-color: #4b5563; margin-right: 10px;">Run with Custom Input</button>
-                <button id="submitBtn" onclick="submitCode()">Submit Code</button>
+            <div class="editor-container">
+                <select id="language">
+                    <option value="c">C</option>
+                    <option value="cpp">C++</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                </select>
+                <div id="editor" style="height: 400px; width: 100%;"></div>
+                
+                <div style="margin-top: 10px;">
+                    <label>Custom Input:</label>
+                    <textarea id="customInput" rows="3"></textarea>
+                </div>
+                
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button id="runBtn" onclick="runCode()" class="btn btn-secondary">Run with Custom Input</button>
+                    <button id="submitBtn" onclick="submitCode()" class="btn">Submit Code</button>
+                </div>
+                
+                <div id="result" style="margin-top: 10px; font-weight: bold;"></div>
+                <pre id="output" style="background: #000; padding: 10px; display: none; margin-top: 10px; border-radius: 5px;"></pre>
             </div>
-            
-            <div id="result" style="margin-top: 10px; font-weight: bold;"></div>
-            <pre id="output" style="background: #000; padding: 10px; display: none;"></pre>
         </div>
     </div>
 

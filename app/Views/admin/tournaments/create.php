@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
+
     <div class="container">
         <h1>Create Tournament</h1>
         <div class="card">
@@ -15,13 +17,13 @@
                 <input type="text" name="title" required>
                 
                 <label>Description</label>
-                <textarea name="description" rows="3"></textarea>
+                <textarea name="description" rows="3" required></textarea>
                 
                 <label>Start Time</label>
-                <input type="datetime-local" name="start_time" required style="background: #333; color: #fff; border: 1px solid #555; padding: 10px; width: 100%; margin-bottom: 10px;">
+                <input type="datetime-local" name="start_time" required>
                 
                 <label>End Time</label>
-                <input type="datetime-local" name="end_time" required style="background: #333; color: #fff; border: 1px solid #555; padding: 10px; width: 100%; margin-bottom: 10px;">
+                <input type="datetime-local" name="end_time" required>
                 
                 <button type="submit" class="btn">Create Tournament</button>
             </form>

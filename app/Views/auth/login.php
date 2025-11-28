@@ -7,21 +7,25 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Login</h2>
-        <?php if (isset($error)): ?>
-            <p style="color: red;"><?= $error ?></p>
-        <?php endif; ?>
-        <form action="<?= APP_URL ?>/login" method="POST">
-            <label>Email:</label>
-            <input type="email" name="email" required>
-            <br>
-            <label>Password:</label>
-            <input type="password" name="password" required>
-            <br>
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="<?= APP_URL ?>/register">Register</a></p>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
+    <div class="container" style="max-width: 400px; margin-top: 50px;">
+        <div class="card">
+            <h1 class="text-center">Login</h1>
+            <?php if (isset($error)): ?>
+                <p style="color: var(--danger); text-align: center;"><?= $error ?></p>
+            <?php endif; ?>
+            <form action="<?= APP_URL ?>/login" method="POST">
+                <label>Email</label>
+                <input type="email" name="email" required>
+                
+                <label>Password</label>
+                <input type="password" name="password" required>
+                
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+            <p class="text-center mt-4">Don't have an account? <a href="<?= APP_URL ?>/register">Register</a></p>
+        </div>
     </div>
 </body>
 </html>

@@ -7,20 +7,29 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
     <div class="container">
         <div class="card">
             <h1><?= $tournament['title'] ?></h1>
             <p><?= $tournament['description'] ?></p>
-            <p><strong>Start:</strong> <?= $tournament['start_time'] ?> | <strong>End:</strong> <?= $tournament['end_time'] ?></p>
+            <div class="flex gap-4" style="margin-top: 10px;">
+                <span class="badge">Start: <?= $tournament['start_time'] ?></span>
+                <span class="badge">End: <?= $tournament['end_time'] ?></span>
+            </div>
             
-            <form action="<?= APP_URL ?>/tournaments/join" method="POST">
-                <input type="hidden" name="tournament_id" value="<?= $tournament['id'] ?>">
-                <button type="submit" class="btn">Join Tournament</button>
-            </form>
+            <?php if (!$isParticipant && $tournament['is_active']): ?>
+                <form action="<?= APP_URL ?>/tournaments/join" method="POST" style="margin-top: 20px;">
+                    <input type="hidden" name="tournament_id" value="<?= $tournament['id'] ?>">
+                    <button type="submit" class="btn">Join Tournament</button>
+                </form>
+            <?php elseif ($isParticipant): ?>
+                <p style="color: var(--success); margin-top: 10px;">You are participating!</p>
+            <?php endif; ?>
         </div>
 
+        <h2>Leaderboard</h2>
         <div class="card">
-            <h3>Participants & Live Score</h3>
             <table>
                 <thead>
                     <tr>
@@ -33,7 +42,7 @@
                     <?php foreach ($participants as $index => $p): ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= $p['name'] . ' ' . $p['surname'] ?></td>
+                        <td><?= $p['name'] ?></td>
                         <td><?= $p['score'] ?></td>
                     </tr>
                     <?php endforeach; ?>

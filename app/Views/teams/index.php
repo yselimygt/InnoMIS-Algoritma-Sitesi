@@ -7,26 +7,29 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
+
     <div class="container">
         <h1>Teams</h1>
-        <div class="card">
-            <h3>You are not in a team yet.</h3>
-            <p>Join a team to compete in tournaments and collaborate with friends.</p>
+        
+        <?php if (isset($error)): ?>
+            <div class="badge danger" style="margin-bottom: 20px; font-size: 1rem; padding: 10px;"><?= $error ?></div>
+        <?php endif; ?>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Create a Team</h3>
+                <p>Start your own team and invite friends.</p>
+                <a href="<?= APP_URL ?>/teams/create" class="btn">Create Team</a>
+            </div>
             
-            <div style="display: flex; gap: 20px; margin-top: 20px;">
-                <div style="flex: 1;">
-                    <h4>Create a Team</h4>
-                    <form action="<?= APP_URL ?>/teams/create" method="GET">
-                        <button type="submit" class="btn">Create Team</button>
-                    </form>
-                </div>
-                <div style="flex: 1; border-left: 1px solid var(--border-color); padding-left: 20px;">
-                    <h4>Join a Team</h4>
-                    <form action="<?= APP_URL ?>/teams/join" method="POST">
-                        <input type="text" name="invite_code" placeholder="Enter Invite Code" required>
-                        <button type="submit" class="btn" style="margin-top: 10px;">Join Team</button>
-                    </form>
-                </div>
+            <div class="card">
+                <h3>Join a Team</h3>
+                <p>Enter an invite code to join an existing team.</p>
+                <form action="<?= APP_URL ?>/teams/join" method="POST">
+                    <input type="text" name="invite_code" placeholder="Invite Code" required>
+                    <button type="submit" class="btn btn-secondary">Join Team</button>
+                </form>
             </div>
         </div>
     </div>

@@ -7,13 +7,12 @@
     <link rel="stylesheet" href="<?= APP_URL ?>/public/css/style.css">
 </head>
 <body>
+    <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
+
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1>Manage Tournaments</h1>
-            <div>
-                <a href="<?= APP_URL ?>/admin/tournaments/create" class="btn">Create Tournament</a>
-                <a href="<?= APP_URL ?>/admin" class="btn" style="background: #555;">Back</a>
-            </div>
+        <div class="flex justify-between items-center">
+            <h1>Tournament Management</h1>
+            <a href="<?= APP_URL ?>/admin/tournaments/create" class="btn">Create Tournament</a>
         </div>
 
         <div class="card">
@@ -32,7 +31,11 @@
                         <td><?= $t['title'] ?></td>
                         <td><?= $t['start_time'] ?></td>
                         <td><?= $t['end_time'] ?></td>
-                        <td><?= $t['is_active'] ? 'Active' : 'Ended' ?></td>
+                        <td>
+                            <span class="badge <?= $t['is_active'] ? 'success' : 'danger' ?>">
+                                <?= $t['is_active'] ? 'Active' : 'Ended' ?>
+                            </span>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
