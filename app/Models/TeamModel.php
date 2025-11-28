@@ -8,8 +8,10 @@ class TeamModel {
     }
 
     public function getUserTeam($userId) {
-        $sql = "SELECT t.* FROM teams t 
+        $sql = "SELECT t.*, CONCAT(u.name, ' ', u.surname) as creator_name 
+                FROM teams t 
                 JOIN team_members tm ON t.id = tm.team_id 
+                JOIN users u ON t.leader_id = u.id
                 WHERE tm.user_id = :uid";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['uid' => $userId]);

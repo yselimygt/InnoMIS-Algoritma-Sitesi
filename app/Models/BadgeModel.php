@@ -7,15 +7,6 @@ class BadgeModel {
         $this->db = Database::getInstance()->getConnection();
     }
 
-<?php
-
-class BadgeModel {
-    private $db;
-
-    public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
-    }
-
     public function getAll() {
         $stmt = $this->db->query("SELECT * FROM badges");
         return $stmt->fetchAll();
