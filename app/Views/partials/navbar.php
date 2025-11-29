@@ -15,6 +15,32 @@ if (session_status() === PHP_SESSION_NONE) {
         <a href="<?= APP_URL ?>/paths">Öğrenme Yolları</a>
         <a href="<?= APP_URL ?>/forum">Forum</a>
         
+        <a href="<?= APP_URL ?>/daily-streak">Günlük Seri</a>
+        
+        <button onclick="toggleTheme()" class="btn btn-secondary" style="padding: 5px 10px; margin-right: 10px;">
+            🌓
+        </button>
+
+        <script>
+            // Sayfa yüklendiğinde temayı kontrol et
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme) {
+                document.documentElement.setAttribute('data-theme', currentTheme);
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme');
+                let next = 'light';
+                if (current === 'light') {
+                    next = 'dark';
+                }
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            }
+        </script>
+
+
+
         <?php if (isset($_SESSION['user_id'])): ?>
             <?php
                 require_once __DIR__ . '/../../Models/NotificationModel.php';

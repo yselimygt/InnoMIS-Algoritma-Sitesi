@@ -80,6 +80,10 @@
                         <div class="stat-value"><?= $followStats['following'] ?? 0 ?></div>
                         <div>Takip Edilen</div>
                     </div>
+                    <div class="stat-box">
+                        <div class="stat-value">🔥 <?= $profileUser['streak_count'] ?? 0 ?></div>
+                        <div>Günlük Seri</div>
+                    </div>
                 </div>
             </div>
             <div>

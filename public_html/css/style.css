@@ -23,6 +23,23 @@
   --font-main: "Outfit", sans-serif;
 }
 
+/* Mevcut :root bloğunun altına ekleyin */
+[data-theme="light"] {
+  --bg-dark: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --glass: none; /* Aydınlık modda blur efektini kaldırabiliriz */
+}
+
+/* Navbar ve butonlar için özel düzeltmeler */
+[data-theme="light"] .navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

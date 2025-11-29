@@ -67,11 +67,72 @@ class Sandbox {
     }
 
     private function runJudge0($language, $code, $input) {
-        if (!JUDGE0_URL) {
-            return ['status' => 'CE', 'output' => 'Judge0 URL yapılandırılmamış.'];
+        $apiKey = JUDGE0_API_KEY; // config.php'den gelecek
+        $endpoint = JUDGE0_URL . "/submissions?base64_encoded=false&wait=true";
+        
+        // Dil ID'leri (Judge0 standart ID'leri)
+        $langIds = [
+            'c' => 50, // GCC 9.2.0
+            'cpp' => 54, // GCC 9.2.0
+            'python' => 71, // Python 3.8.1
+            'java' => 62, // OpenJDK 13.0.1
+        ];
+
+        if (!isset($langIds[$language])) {
+            return ['status' => 'CE', 'output' => 'Dil desteklenmiyor.'];
         }
-        // Bu ortamda dış ağ kapalı, bu nedenle sadece iskelet bırakıldı.
-        return ['status' => 'CE', 'output' => 'Judge0 için bağlantı yapılamadı (ağ kısıtlı).'];
+
+        $postData = [
+            'source_code' => $code,
+            'language_id' => $langIds[$language],
+            'stdin' => $input
+        ];
+
+        $ch = curl_init($endpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            // Eğer RapidAPI kullanıyorsanız bu başlıkları açın:
+            // 'X-RapidAPI-Key: ' . $apiKey,
+            // 'X-RapidAPI-Host: judge0-ce.p.rapidapi.com'
+        ]);
+
+        $response = curl_exec($ch);
+        
+        if (curl_errno($ch)) {
+            return ['status' => 'CE', 'output' => 'Sandbox hatası: ' . curl_error($ch)];
+        }
+        curl_close($ch);
+
+        $result = json_decode($response, true);
+
+        // Sonucu InnoMIS formatına çevir
+        // Judge0 status id: 3 (Accepted), 4 (Wrong Answer), 5 (Time Limit), 6 (Compilation Error) vb.
+        $statusId = $result['status']['id'] ?? 0;
+        $finalStatus = 'PENDING';
+        $output = '';
+
+        if ($statusId == 3) {
+            $finalStatus = 'AC';
+            $output = $result['stdout'] ?? '';
+        } elseif ($statusId == 4) {
+            $finalStatus = 'WA';
+            $output = "Beklenen çıktı ile uyuşmadı.\nÇıktı:\n" . ($result['stdout'] ?? '');
+        } elseif ($statusId == 6) {
+            $finalStatus = 'CE';
+            $output = $result['compile_output'] ?? '';
+        } else {
+            $finalStatus = 'RE'; // Diğer hatalar (Runtime Error vb.)
+            $output = $result['stderr'] ?? ($result['message'] ?? 'Hata');
+        }
+
+        return [
+            'status' => $finalStatus,
+            'output' => trim($output),
+            'time' => $result['time'] ?? 0
+        ];
     }
 
     private function runLocal($language, $code, $input) {

@@ -356,3 +356,12 @@ CREATE TABLE `user_follows` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 COMMIT;
+
+
+-- For Daily Streak System
+ALTER TABLE users ADD COLUMN last_login_at DATE DEFAULT NULL;
+ALTER TABLE users ADD COLUMN streak_count INT DEFAULT 0;
+
+-- For Hint System (for future use)
+ALTER TABLE problems ADD COLUMN hint TEXT DEFAULT NULL;
+ALTER TABLE problems ADD COLUMN hint_cost INT DEFAULT 5; -- Hint cost (XP or Coin)
