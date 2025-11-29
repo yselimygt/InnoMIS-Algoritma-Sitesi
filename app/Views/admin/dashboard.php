@@ -54,6 +54,10 @@
                 <h3>Rozet Yönetimi</h3>
                 <p style="color:#9ca3af;">Rozet ekle, düzenle.</p>
             </a>
+            <a class="card-link" href="<?= APP_URL ?>/admin/forum">
+                <h3>Forum Moderasyonu</h3>
+                <p style="color:#9ca3af;">Başlıkları yayından kaldır veya sil.</p>
+            </a>
         </div>
     </div>
 </body>

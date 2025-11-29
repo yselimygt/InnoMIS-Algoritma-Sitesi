@@ -32,24 +32,35 @@ $router->get('/admin', 'AdminController@index');
 $router->get('/admin/problems', 'AdminController@problems');
 $router->get('/admin/problems/create', 'AdminController@createProblem');
 $router->post('/admin/problems/store', 'AdminController@storeProblem');
+$router->get('/admin/problems/{id}/edit', 'AdminController@editProblem');
+$router->post('/admin/problems/update', 'AdminController@updateProblem');
+$router->post('/admin/problems/delete', 'AdminController@deleteProblem');
 
 // Admin Users
 $router->get('/admin/users', 'AdminController@manageUsers');
 $router->post('/admin/users/update-role', 'AdminController@updateUserRole');
+$router->post('/admin/users/delete', 'AdminController@deleteUser');
 
 // Admin Badges
 $router->get('/admin/badges', 'AdminController@manageBadges');
 $router->get('/admin/badges/create', 'AdminController@createBadge');
 $router->post('/admin/badges/store', 'AdminController@storeBadge');
+$router->get('/admin/badges/{id}/edit', 'AdminController@editBadge');
+$router->post('/admin/badges/update', 'AdminController@updateBadge');
+$router->post('/admin/badges/delete', 'AdminController@deleteBadge');
 
 // Admin Tournaments
 $router->get('/admin/tournaments', 'AdminController@manageTournaments');
 $router->get('/admin/tournaments/create', 'AdminController@createTournament');
 $router->post('/admin/tournaments/store', 'AdminController@storeTournament');
+$router->get('/admin/tournaments/{id}/edit', 'AdminController@editTournament');
+$router->post('/admin/tournaments/update', 'AdminController@updateTournament');
+$router->post('/admin/tournaments/delete', 'AdminController@deleteTournament');
 
 // Admin Forum
 $router->get('/admin/forum', 'AdminController@forumThreads');
 $router->post('/admin/forum/toggle', 'AdminController@toggleThread');
+$router->post('/admin/forum/delete', 'AdminController@deleteThread');
 
 // Profile
 $router->get('/profile', 'ProfileController@index');

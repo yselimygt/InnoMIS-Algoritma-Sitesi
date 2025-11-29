@@ -15,6 +15,12 @@ class ProfileController extends Controller {
         
         $userModel = new UserModel();
         $user = $userModel->findById($userId);
+
+        // Oturum var ama kullanıcı kaydı yoksa (örn. veritabanı sıfırlandıysa) yeniden girişe yönlendir
+        if (!$user) {
+            session_destroy();
+            $this->redirect('/login');
+        }
         
         $badgeModel = new BadgeModel();
         $badges = $badgeModel->getUserBadges($userId);

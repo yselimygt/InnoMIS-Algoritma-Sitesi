@@ -10,20 +10,44 @@
     <?php require_once __DIR__ . '/../../partials/navbar.php'; ?>
 
     <div class="container">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-4" style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Rozet Yönetimi</h1>
             <a href="<?= APP_URL ?>/admin/badges/create" class="btn">Yeni Rozet Ekle</a>
         </div>
 
-        <div class="grid">
-            <?php foreach ($badges as $badge): ?>
-            <div class="card">
-                <div style="font-size: 2rem; margin-bottom: 10px;"><?= $badge['icon'] ?></div>
-                <h3><?= $badge['name'] ?></h3>
-                <p><?= $badge['description'] ?></p>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Gereksinim: <?= $badge['criteria'] ?></p>
-            </div>
-            <?php endforeach; ?>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Başlık</th>
+                        <th>Slug</th>
+                        <th>Tür</th>
+                        <th>Nadirlik</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($badges as $badge): ?>
+                    <tr>
+                        <td><?= $badge['id'] ?></td>
+                        <td><?= htmlspecialchars($badge['name']) ?></td>
+                        <td><?= htmlspecialchars($badge['slug']) ?></td>
+                        <td><?= $badge['type'] ?></td>
+                        <td><?= $badge['rarity'] ?></td>
+                        <td><?= $badge['is_active'] ? 'Aktif' : 'Pasif' ?></td>
+                        <td>
+                            <a href="<?= APP_URL ?>/admin/badges/<?= $badge['id'] ?>/edit">Düzenle</a> | 
+                            <form action="<?= APP_URL ?>/admin/badges/delete" method="POST" style="display:inline;" onsubmit="return confirm('Silinsin mi?');">
+                                <input type="hidden" name="id" value="<?= $badge['id'] ?>">
+                                <button type="submit" class="btn btn-secondary" style="padding:4px 8px;">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </body>

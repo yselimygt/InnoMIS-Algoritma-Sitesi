@@ -6,40 +6,11 @@
     <title>Profil - InnoMIS</title>
     <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
     <style>
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: #fff;
-            border: 2px solid var(--primary);
-        }
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin-top: 10px;
-        }
-        .stat-box {
-            background: rgba(255,255,255,0.05);
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary);
-        }
+        .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; border: 2px solid var(--primary); }
+        .stats { display: flex; gap: 20px; margin-top: 10px; }
+        .stat-box { background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 5px; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -48,18 +19,22 @@
     <div class="container">
         <div class="card profile-header">
             <div class="avatar">
-                <?= strtoupper(substr($user['name'], 0, 1) . substr($user['surname'], 0, 1)) ?>
+                <?php
+                    $first = isset($user['name']) ? substr((string)$user['name'], 0, 1) : '';
+                    $last = isset($user['surname']) ? substr((string)$user['surname'], 0, 1) : '';
+                    echo strtoupper($first . $last);
+                ?>
             </div>
             <div style="flex: 1;">
-                <h1 style="margin: 0; font-size: 2rem;"><?= $user['name'] . ' ' . $user['surname'] ?></h1>
-                <p><?= $user['email'] ?></p>
+                <h1 style="margin: 0; font-size: 2rem;"><?= htmlspecialchars($user['name'] . ' ' . $user['surname']) ?></h1>
+                <p><?= htmlspecialchars($user['email']) ?></p>
                 <div class="stats">
                     <div class="stat-box">
-                        <div class="stat-value"><?= $user['level'] ?></div>
+                        <div class="stat-value"><?= $user['level'] ?? 0 ?></div>
                         <div>Seviye</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value"><?= $user['xp'] ?></div>
+                        <div class="stat-value"><?= $user['xp'] ?? 0 ?></div>
                         <div>XP</div>
                     </div>
                 </div>
@@ -75,10 +50,10 @@
             <?php else: ?>
                 <?php foreach ($badges as $badge): ?>
                 <div class="card">
-                    <div style="font-size: 2rem; margin-bottom: 10px;"><?= $badge['icon'] ?></div>
-                    <h3><?= $badge['name'] ?></h3>
-                    <p><?= $badge['description'] ?></p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Kazanıldı: <?= $badge['earned_at'] ?></p>
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🏅</div>
+                    <h3><?= htmlspecialchars($badge['name']) ?></h3>
+                    <p><?= htmlspecialchars($badge['description']) ?></p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Kazanıldı: <?= $badge['granted_at'] ?></p>
                 </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -101,7 +76,7 @@
                     <?php else: ?>
                         <?php foreach ($submissions as $sub): ?>
                         <tr>
-                            <td><a href="<?= APP_URL ?>/problem/<?= $sub['problem_slug'] ?>"><?= $sub['problem_title'] ?></a></td>
+                            <td><a href="<?= APP_URL ?>/problem/<?= $sub['problem_slug'] ?>"><?= htmlspecialchars($sub['problem_title']) ?></a></td>
                             <td><?= $sub['language'] ?></td>
                             <td style="color: <?= $sub['result'] == 'AC' ? 'var(--secondary)' : 'red' ?>"><?= $sub['result'] ?></td>
                             <td><?= $sub['execution_time'] ?>s</td>

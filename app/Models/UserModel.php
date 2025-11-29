@@ -55,4 +55,9 @@ class UserModel {
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['role' => $role, 'id' => $userId]);
     }
+
+    public function delete($userId) {
+        $stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
+        $stmt->execute(['id' => $userId]);
+    }
 }

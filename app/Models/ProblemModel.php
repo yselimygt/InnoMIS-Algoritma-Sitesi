@@ -7,9 +7,19 @@ class ProblemModel {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function getAll() {
-        $stmt = $this->db->query("SELECT * FROM problems WHERE is_active = 1");
+    public function getAll($onlyActive = true) {
+        $sql = "SELECT * FROM problems";
+        if ($onlyActive) {
+            $sql .= " WHERE is_active = 1";
+        }
+        $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
+    }
+
+    public function getById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM problems WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch();
     }
 
     public function getBySlug($slug) {
@@ -22,6 +32,11 @@ class ProblemModel {
         $stmt = $this->db->prepare("SELECT * FROM test_cases WHERE problem_id = :id");
         $stmt->execute(['id' => $problemId]);
         return $stmt->fetchAll();
+    }
+
+    public function deleteTestCases($problemId) {
+        $stmt = $this->db->prepare("DELETE FROM test_cases WHERE problem_id = :id");
+        $stmt->execute(['id' => $problemId]);
     }
     
     public function saveSubmission($userId, $problemId, $language, $code, $result, $time) {
@@ -60,6 +75,29 @@ class ProblemModel {
             'output' => $data['output'],
             'is_sample' => isset($data['is_sample']) ? 1 : 0
         ]);
+    }
+
+    public function update($id, $data) {
+        $sql = "UPDATE problems SET title = :title, slug = :slug, description = :description, 
+                input_format = :input_format, output_format = :output_format, difficulty = :difficulty, 
+                tags = :tags, is_active = :is_active WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            'id' => $id,
+            'title' => $data['title'],
+            'slug' => $data['slug'],
+            'description' => $data['description'],
+            'input_format' => $data['input_format'],
+            'output_format' => $data['output_format'],
+            'difficulty' => $data['difficulty'],
+            'tags' => $data['tags'],
+            'is_active' => isset($data['is_active']) ? 1 : 0
+        ]);
+    }
+
+    public function delete($id) {
+        $stmt = $this->db->prepare("DELETE FROM problems WHERE id = :id");
+        return $stmt->execute(['id' => $id]);
     }
 
     public function getUserSubmissions($userId) {

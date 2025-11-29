@@ -39,6 +39,10 @@
                                         <button type="submit" class="btn btn-secondary">Gizle</button>
                                     <?php endif; ?>
                                 </form>
+                                <form action="<?= APP_URL ?>/admin/forum/delete" method="POST" onsubmit="return confirm('Kalıcı silinsin mi?');" style="margin-top:6px;">
+                                    <input type="hidden" name="thread_id" value="<?= $thread['id'] ?>">
+                                    <button type="submit" class="btn btn-secondary" style="padding:4px 8px;">Sil</button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

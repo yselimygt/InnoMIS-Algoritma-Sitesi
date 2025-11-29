@@ -12,20 +12,39 @@
     <div class="container">
         <h1>Rozet Oluştur</h1>
         <div class="card">
-            <form action="<?= APP_URL ?>/admin/badges/store" method="POST">
-                <label>Rozet Adı</label>
+            <form action="<?= APP_URL ?>/admin/badges/store" method="POST" enctype="multipart/form-data">
+                <label>Başlık</label>
                 <input type="text" name="name" required>
-                
+
+                <label>Slug (boş bırakılırsa otomatik)</label>
+                <input type="text" name="slug">
+
                 <label>Açıklama</label>
                 <textarea name="description" rows="3" required></textarea>
-                
-                <label>İkon (Emoji)</label>
-                <input type="text" name="icon" placeholder="🏆" required>
-                
-                <label>Kriter (JSON)</label>
-                <input type="text" name="criteria" placeholder='{"problems_solved": 10}' required>
-                
-                <button type="submit" class="btn">Rozet Oluştur</button>
+
+                <label>Tür</label>
+                <select name="type">
+                    <option value="system">Sistem</option>
+                    <option value="community">Topluluk</option>
+                    <option value="event">Etkinlik</option>
+                    <option value="season">Sezon</option>
+                    <option value="special">Özel</option>
+                </select>
+
+                <label>Nadirlik</label>
+                <select name="rarity">
+                    <option value="common">Sık</option>
+                    <option value="rare">Nadir</option>
+                    <option value="epic">Efsanevi</option>
+                    <option value="legendary">Legendary</option>
+                </select>
+
+                <label>İkon (resim) - isteğe bağlı</label>
+                <input type="file" name="icon" accept="image/*">
+
+                <label><input type="checkbox" name="is_active" value="1" checked> Aktif</label>
+
+                <button type="submit" class="btn" style="margin-top:10px;">Kaydet</button>
             </form>
         </div>
     </div>

@@ -55,4 +55,22 @@ class TournamentModel {
             'end' => $endTime
         ]);
     }
+
+    public function update($id, $title, $description, $startTime, $endTime, $isActive) {
+        $sql = "UPDATE tournaments SET title = :title, description = :desc, start_time = :start, end_time = :end, is_active = :active WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'title' => $title,
+            'desc' => $description,
+            'start' => $startTime,
+            'end' => $endTime,
+            'active' => $isActive ? 1 : 0,
+            'id' => $id
+        ]);
+    }
+
+    public function delete($id) {
+        $stmt = $this->db->prepare("DELETE FROM tournaments WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+    }
 }

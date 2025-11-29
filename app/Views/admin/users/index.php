@@ -28,7 +28,7 @@
                             <td><?= htmlspecialchars($user['name'] . ' ' . $user['surname']) ?></td>
                             <td><?= htmlspecialchars($user['email']) ?></td>
                             <td><?= $user['role'] ?></td>
-                            <td>
+                            <td style="display:flex; gap:6px;">
                                 <form action="<?= APP_URL ?>/admin/users/update-role" method="POST" style="display:flex; gap:6px; align-items:center;">
                                     <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                                     <select name="role">
@@ -37,6 +37,12 @@
                                     </select>
                                     <button type="submit" class="btn">Kaydet</button>
                                 </form>
+                                <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                                <form action="<?= APP_URL ?>/admin/users/delete" method="POST" onsubmit="return confirm('Bu kullanıcıyı silmek istiyor musunuz?');">
+                                    <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                    <button type="submit" class="btn btn-secondary" style="padding:4px 8px;">Sil</button>
+                                </form>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -89,4 +89,9 @@ class ForumModel {
         $stmt = $this->db->prepare("UPDATE forum_threads SET is_deleted = :del WHERE id = :id");
         $stmt->execute(['del' => $isDeleted ? 1 : 0, 'id' => $threadId]);
     }
+
+    public function deleteThread($id) {
+        $stmt = $this->db->prepare("DELETE FROM forum_threads WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+    }
 }

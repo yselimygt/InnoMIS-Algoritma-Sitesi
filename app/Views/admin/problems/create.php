@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Problem - Admin - InnoMIS</title>
+    <title>Problem Oluştur - Admin - InnoMIS</title>
     <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
     <style>
         .test-case {
@@ -16,57 +16,59 @@
 </head>
 <body>
     <div class="container">
-        <h1>Create New Problem</h1>
+        <h1>Yeni Problem Oluştur</h1>
         <form action="<?= APP_URL ?>/admin/problems/store" method="POST">
             <div class="card">
-                <h3>Basic Info</h3>
-                <label>Title</label>
+                <h3>Temel Bilgiler</h3>
+                <label>Başlık</label>
                 <input type="text" name="title" required>
                 
-                <label>Slug (URL-friendly)</label>
+                <label>Slug (URL)</label>
                 <input type="text" name="slug" required>
                 
-                <label>Difficulty</label>
+                <label>Zorluk</label>
                 <select name="difficulty">
-                    <option value="easy">Easy (10 XP)</option>
-                    <option value="medium">Medium (20 XP)</option>
-                    <option value="hard">Hard (30 XP)</option>
+                    <option value="easy">Kolay</option>
+                    <option value="medium">Orta</option>
+                    <option value="hard">Zor</option>
                 </select>
                 
-                <label>Tags (comma separated)</label>
+                <label>Etiketler (virgül ile)</label>
                 <input type="text" name="tags" placeholder="math, array, string">
+
+                <label><input type="checkbox" name="is_active" value="1" checked> Aktif</label>
             </div>
 
             <div class="card">
-                <h3>Description & Format</h3>
-                <label>Description (Markdown supported)</label>
+                <h3>Açıklama ve Format</h3>
+                <label>Açıklama</label>
                 <textarea name="description" rows="10" required></textarea>
                 
-                <label>Input Format</label>
+                <label>Girdi Formatı</label>
                 <textarea name="input_format" rows="3"></textarea>
                 
-                <label>Output Format</label>
+                <label>Çıktı Formatı</label>
                 <textarea name="output_format" rows="3"></textarea>
             </div>
 
             <div class="card">
-                <h3>Test Cases</h3>
+                <h3>Test Case</h3>
                 <div id="test-cases-container">
                     <div class="test-case">
-                        <h4>Case 1 (Sample)</h4>
+                        <h4>Case 1 (Örnek)</h4>
                         <label>Input</label>
                         <textarea name="test_cases[0][input]" rows="2" required></textarea>
                         <label>Output</label>
                         <textarea name="test_cases[0][output]" rows="2" required></textarea>
                         <label>
-                            <input type="checkbox" name="test_cases[0][is_sample]" value="1" checked> Is Sample?
+                            <input type="checkbox" name="test_cases[0][is_sample]" value="1" checked> Örnek
                         </label>
                     </div>
                 </div>
-                <button type="button" onclick="addTestCase()" class="btn" style="background-color: #4b5563;">+ Add Test Case</button>
+                <button type="button" onclick="addTestCase()" class="btn" style="background-color: #4b5563;">+ Test Case Ekle</button>
             </div>
 
-            <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Create Problem</button>
+            <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Kaydet</button>
         </form>
     </div>
 

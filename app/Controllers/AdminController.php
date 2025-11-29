@@ -32,7 +32,7 @@ class AdminController extends Controller {
 
     public function problems() {
         $model = new ProblemModel();
-        $problems = $model->getAll();
+        $problems = $model->getAll(false);
         $this->view('admin/problems/index', ['problems' => $problems]);
     }
 
@@ -47,12 +47,13 @@ class AdminController extends Controller {
 
         $problemData = [
             'title' => $_POST['title'],
-            'slug' => $_POST['slug'],
+            'slug' => $_POST['slug'] ?: $this->slugify($_POST['title']),
             'description' => $_POST['description'],
             'input_format' => $_POST['input_format'],
             'output_format' => $_POST['output_format'],
             'difficulty' => $_POST['difficulty'],
-            'tags' => $_POST['tags']
+            'tags' => $_POST['tags'],
+            'is_active' => isset($_POST['is_active']) ? 1 : 0
         ];
 
         $testCases = $_POST['test_cases'] ?? [];
@@ -68,6 +69,55 @@ class AdminController extends Controller {
         } else {
             die("Problem oluşturulamadı. Slug çakışıyor olabilir.");
         }
+    }
+
+    public function editProblem($id) {
+        $model = new ProblemModel();
+        $problem = $model->getById($id);
+        $cases = $model->getTestCases($id);
+        if (!$problem) {
+            die("Problem bulunamadı");
+        }
+        $this->view('admin/problems/edit', ['problem' => $problem, 'cases' => $cases]);
+    }
+
+    public function updateProblem() {
+        $id = $_POST['id'];
+        $model = new ProblemModel();
+        $problem = $model->getById($id);
+        if (!$problem) {
+            die("Problem bulunamadı");
+        }
+
+        $data = [
+            'title' => $_POST['title'],
+            'slug' => $_POST['slug'] ?: $this->slugify($_POST['title']),
+            'description' => $_POST['description'],
+            'input_format' => $_POST['input_format'],
+            'output_format' => $_POST['output_format'],
+            'difficulty' => $_POST['difficulty'],
+            'tags' => $_POST['tags'],
+            'is_active' => isset($_POST['is_active']) ? 1 : 0
+        ];
+        $model->update($id, $data);
+
+        // İsteğe bağlı yeni test case ekle
+        if (!empty($_POST['test_cases'])) {
+            foreach ($_POST['test_cases'] as $case) {
+                if (trim($case['input']) !== '' || trim($case['output']) !== '') {
+                    $model->addTestCase($id, $case);
+                }
+            }
+        }
+
+        $this->redirect('/admin/problems');
+    }
+
+    public function deleteProblem() {
+        $id = $_POST['id'];
+        $model = new ProblemModel();
+        $model->delete($id);
+        $this->redirect('/admin/problems');
     }
 
     public function manageUsers() {
@@ -99,8 +149,12 @@ class AdminController extends Controller {
     public function storeBadge() {
         $name = $_POST['name'];
         $description = $_POST['description'];
-        $iconPath = 'default_badge.png';
+        $type = $_POST['type'];
+        $rarity = $_POST['rarity'];
+        $slug = $_POST['slug'] ?: $this->slugify($name);
+        $isActive = isset($_POST['is_active']) ? 1 : 0;
 
+        $iconPath = 'default_badge.png';
         if (isset($_FILES['icon']) && $_FILES['icon']['error'] == 0) {
             $uploadDir = __DIR__ . '/../../public_html/uploads/badges/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
@@ -112,8 +166,60 @@ class AdminController extends Controller {
         }
 
         $badgeModel = new BadgeModel();
-        $badgeModel->create($name, $description, $iconPath);
+        $badgeModel->create([
+            'slug' => $slug,
+            'name' => $name,
+            'description' => $description,
+            'type' => $type,
+            'rarity' => $rarity,
+            'icon_path' => $iconPath,
+            'is_active' => $isActive
+        ]);
         
+        $this->redirect('/admin/badges');
+    }
+
+    public function editBadge($id) {
+        $badgeModel = new BadgeModel();
+        $badge = $badgeModel->getById($id);
+        if (!$badge) die("Rozet bulunamadı");
+        $this->view('admin/badges/edit', ['badge' => $badge]);
+    }
+
+    public function updateBadge() {
+        $id = $_POST['id'];
+        $badgeModel = new BadgeModel();
+        $badge = $badgeModel->getById($id);
+        if (!$badge) die("Rozet bulunamadı");
+
+        $iconPath = $badge['icon_path'];
+        if (isset($_FILES['icon']) && $_FILES['icon']['error'] == 0) {
+            $uploadDir = __DIR__ . '/../../public_html/uploads/badges/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+            
+            $fileName = uniqid() . '_' . basename($_FILES['icon']['name']);
+            if (move_uploaded_file($_FILES['icon']['tmp_name'], $uploadDir . $fileName)) {
+                $iconPath = $fileName;
+            }
+        }
+
+        $badgeModel->update($id, [
+            'slug' => $_POST['slug'] ?: $this->slugify($_POST['name']),
+            'name' => $_POST['name'],
+            'description' => $_POST['description'],
+            'type' => $_POST['type'],
+            'rarity' => $_POST['rarity'],
+            'icon_path' => $iconPath,
+            'is_active' => isset($_POST['is_active']) ? 1 : 0
+        ]);
+
+        $this->redirect('/admin/badges');
+    }
+
+    public function deleteBadge() {
+        $id = $_POST['id'];
+        $badgeModel = new BadgeModel();
+        $badgeModel->delete($id);
         $this->redirect('/admin/badges');
     }
 
@@ -139,6 +245,44 @@ class AdminController extends Controller {
         $this->redirect('/admin/tournaments');
     }
 
+    public function editTournament($id) {
+        $model = new TournamentModel();
+        $tournament = $model->getById($id);
+        if (!$tournament) die("Turnuva bulunamadı");
+        $this->view('admin/tournaments/edit', ['tournament' => $tournament]);
+    }
+
+    public function updateTournament() {
+        $id = $_POST['id'];
+        $model = new TournamentModel();
+        $model->update(
+            $id,
+            $_POST['title'],
+            $_POST['description'],
+            $_POST['start_time'],
+            $_POST['end_time'],
+            isset($_POST['is_active']) ? 1 : 0
+        );
+        $this->redirect('/admin/tournaments');
+    }
+
+    public function deleteTournament() {
+        $id = $_POST['id'];
+        $model = new TournamentModel();
+        $model->delete($id);
+        $this->redirect('/admin/tournaments');
+    }
+
+    public function deleteUser() {
+        $userId = $_POST['user_id'];
+        if ($userId == $_SESSION['user_id']) {
+            die("Kendi hesabınızı silemezsiniz.");
+        }
+        $userModel = new UserModel();
+        $userModel->delete($userId);
+        $this->redirect('/admin/users');
+    }
+
     public function forumThreads() {
         $forum = new ForumModel();
         $threads = $forum->getAllThreadsForAdmin();
@@ -151,5 +295,25 @@ class AdminController extends Controller {
         $forum = new ForumModel();
         $forum->setThreadVisibility($threadId, $hide);
         $this->redirect('/admin/forum');
+    }
+
+    public function deleteThread() {
+        $id = $_POST['thread_id'];
+        $forum = new ForumModel();
+        $forum->deleteThread($id);
+        $this->redirect('/admin/forum');
+    }
+
+    private function slugify($text) {
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = trim($text, '-');
+        $text = preg_replace('~-+~', '-', $text);
+        $text = strtolower($text);
+        if (empty($text)) {
+            return uniqid('item-');
+        }
+        return $text;
     }
 }
