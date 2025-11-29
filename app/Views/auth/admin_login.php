@@ -14,6 +14,8 @@
                 <div style="color: red; margin-bottom: 10px;"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
             <form action="<?= APP_URL ?>/admin/login" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                
                 <label>E-posta</label>
                 <input type="email" name="email" required value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>">
 
