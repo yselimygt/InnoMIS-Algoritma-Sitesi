@@ -7,7 +7,7 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 
 // Application Configuration
-define('APP_URL', 'http://localhost/InnoMIS-Algoritma-Sitesi/public');
+define('APP_URL', 'http://localhost/InnoMIS-Algoritma-Sitesi/public_html');
 define('APP_NAME', 'InnoMIS Algoritma Platformu');
 
 // Error Reporting
