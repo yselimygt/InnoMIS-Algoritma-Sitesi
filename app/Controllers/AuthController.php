@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../Models/UserModel.php';
+require_once __DIR__ . '/../Models/AdminModel.php';
 
 class AuthController extends Controller {
     public function login() {
@@ -23,6 +24,41 @@ class AuthController extends Controller {
             $this->redirect('/');
         } else {
             $this->view('auth/login', ['error' => 'Invalid email or password']);
+        }
+    }
+
+    public function adminLogin() {
+        $this->view('auth/admin_login');
+    }
+
+    public function adminLoginPost() {
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        // Admin tablosu ile kontrol
+        $adminModel = new AdminModel();
+        $admin = $adminModel->findByEmail($email);
+        if ($admin && password_verify($password, $admin['password'])) {
+            session_start();
+            $_SESSION['user_id'] = $admin['id'];
+            $_SESSION['user_name'] = $admin['email'];
+            $_SESSION['role'] = 'admin';
+            $this->redirect('/admin');
+            return;
+        }
+
+        // Geriye dönük: users tablosundaki admin hesabı
+        $userModel = new UserModel();
+        $user = $userModel->login($email, $password);
+
+        if ($user && $user['role'] === 'admin') {
+            session_start();
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
+            $_SESSION['role'] = $user['role'];
+            $this->redirect('/admin');
+        } else {
+            $this->view('auth/admin_login', ['error' => 'Bu giriş sadece admin kullanıcılar içindir.']);
         }
     }
 

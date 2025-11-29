@@ -9,6 +9,7 @@ SET time_zone = "+00:00";
 -- Cleanup existing tables
 -- -------------------------------------------------------------------
 DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS forum_comments;
 DROP TABLE IF EXISTS forum_threads;
 DROP TABLE IF EXISTS tournament_participants;
@@ -48,6 +49,18 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `student_number` (`student_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------------------------------------------------
+-- admins (sadece e-posta ve şifre)
+-- -------------------------------------------------------------------
+CREATE TABLE `admins` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(150) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- -------------------------------------------------------------------

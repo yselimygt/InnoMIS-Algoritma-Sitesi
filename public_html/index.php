@@ -29,6 +29,10 @@ $router->get('/api/leaderboard', 'LeaderboardController@api');
 
 // Admin Routes
 $router->get('/admin', 'AdminController@index');
+$router->get('/admin/login', 'AuthController@adminLogin');
+$router->post('/admin/login', 'AuthController@adminLoginPost');
+$router->get('/admin_login', 'AuthController@adminLogin'); // alternatif yol
+$router->post('/admin_login', 'AuthController@adminLoginPost');
 $router->get('/admin/problems', 'AdminController@problems');
 $router->get('/admin/problems/create', 'AdminController@createProblem');
 $router->post('/admin/problems/store', 'AdminController@storeProblem');
