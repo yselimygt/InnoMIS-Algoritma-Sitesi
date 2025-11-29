@@ -8,6 +8,7 @@ SET time_zone = "+00:00";
 -- -------------------------------------------------------------------
 -- Cleanup existing tables
 -- -------------------------------------------------------------------
+DROP TABLE IF EXISTS user_follows;
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS forum_comments;
@@ -318,6 +319,21 @@ CREATE TABLE `notifications` (
   KEY `user_id` (`user_id`),
   KEY `is_read` (`is_read`),
   CONSTRAINT `fk_notifications_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------------------------------------------------
+-- user_follows
+-- -------------------------------------------------------------------
+CREATE TABLE `user_follows` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `follower_id` int(11) NOT NULL,
+  `followee_id` int(11) NOT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_follow_pair` (`follower_id`, `followee_id`),
+  KEY `followee_id` (`followee_id`),
+  CONSTRAINT `fk_user_follows_follower` FOREIGN KEY (`follower_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_user_follows_followee` FOREIGN KEY (`followee_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 COMMIT;

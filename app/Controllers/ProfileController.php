@@ -3,33 +3,75 @@
 require_once __DIR__ . '/../Models/UserModel.php';
 require_once __DIR__ . '/../Models/BadgeModel.php';
 require_once __DIR__ . '/../Models/ProblemModel.php';
+require_once __DIR__ . '/../Models/FollowModel.php';
 
-class ProfileController extends Controller {
-    public function index() {
+class ProfileController extends Controller
+{
+    private $userModel;
+    private $badgeModel;
+    private $problemModel;
+    private $followModel;
+
+    public function __construct()
+    {
         session_start();
+        $this->userModel = new UserModel();
+        $this->badgeModel = new BadgeModel();
+        $this->problemModel = new ProblemModel();
+        $this->followModel = new FollowModel();
+    }
+
+    public function index()
+    {
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
         }
-        
-        $userId = $_SESSION['user_id'];
-        
-        $userModel = new UserModel();
-        $user = $userModel->findById($userId);
+        $viewerId = (int) $_SESSION['user_id'];
+        $this->renderProfile($viewerId, $viewerId);
+    }
 
-        // Oturum var ama kullanıcı kaydı yoksa (örn. veritabanı sıfırlandıysa) yeniden girişe yönlendir
+    public function show($id)
+    {
+        $profileUserId = (int) $id;
+        $viewerId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+        $this->renderProfile($profileUserId, $viewerId);
+    }
+
+    private function renderProfile(int $profileUserId, ?int $viewerId): void
+    {
+        $user = $this->userModel->findById($profileUserId);
+
         if (!$user) {
-            session_destroy();
-            $this->redirect('/login');
+            if ($viewerId !== null && $viewerId === $profileUserId) {
+                session_destroy();
+                $this->redirect('/login');
+                return;
+            }
+            http_response_code(404);
+            echo "Kullanıcı bulunamadı";
+            return;
         }
-        
-        $badgeModel = new BadgeModel();
-        $badges = $badgeModel->getUserBadges($userId);
-        
-        $problemModel = new ProblemModel();
-        $submissions = $problemModel->getUserSubmissions($userId);
-        
+
+        $badges = $this->badgeModel->getUserBadges($profileUserId);
+        $submissions = $this->problemModel->getUserSubmissions($profileUserId);
+        $followStats = $this->followModel->getStats($profileUserId);
+        $followerList = $this->followModel->getFollowers($profileUserId, 6);
+        $followingList = $this->followModel->getFollowing($profileUserId, 6);
+
+        $isSelf = $viewerId !== null && $viewerId === $profileUserId;
+        $isFollowing = false;
+        if ($viewerId !== null && !$isSelf) {
+            $isFollowing = $this->followModel->isFollowing($viewerId, $profileUserId);
+        }
+
         $this->view('profile/index', [
-            'user' => $user,
+            'profileUser' => $user,
+            'viewerId' => $viewerId,
+            'isSelf' => $isSelf,
+            'isFollowing' => $isFollowing,
+            'followStats' => $followStats,
+            'followers' => $followerList,
+            'following' => $followingList,
             'badges' => $badges,
             'submissions' => $submissions
         ]);

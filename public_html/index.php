@@ -110,6 +110,11 @@ $router->post('/admin/forum/delete', 'AdminController@deleteThread');
 
 // Profile
 $router->get('/profile', 'ProfileController@index');
+$router->get('/profile/{id}', 'ProfileController@show');
+
+// Follow actions
+$router->post('/follow', 'FollowController@follow');
+$router->post('/unfollow', 'FollowController@unfollow');
 
 // Learning Paths
 $router->get('/paths', 'LearningPathController@index');
