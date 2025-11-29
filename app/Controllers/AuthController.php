@@ -16,49 +16,50 @@ class AuthController extends Controller {
         $user = $userModel->login($email, $password);
 
         if ($user) {
-            session_start();
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['role'] = $user['role'];
+
+            // --- GÜNLÜK SERİ MANTIĞI BAŞLANGIÇ ---
+            $today = date('Y-m-d');
+            $lastLogin = $user['last_login_at'];
             
-            // ... loginPost fonksiyonu içinde, başarılı giriş bloğunda ...
-            if ($user) {
-                session_start();
-                // ... mevcut session atamaları ...
+            $newStreak = $user['streak_count'];
+            $shouldUpdate = false;
 
-                // --- GÜNLÜK SERİ MANTIĞI BAŞLANGIÇ ---
-                $today = date('Y-m-d');
-                $lastLogin = $user['last_login_at'];
+            if ($lastLogin == date('Y-m-d', strtotime('-1 day'))) {
+                // Dün giriş yapmış, seriyi artır
+                $newStreak++;
+                $shouldUpdate = true;
+            } elseif ($lastLogin != $today) {
+                // Dün girmemiş (veya ilk kez giriyor), seriyi sıfırla (veya 1 yap)
+                $newStreak = 1;
+                $shouldUpdate = true;
+            }
+            
+            if ($shouldUpdate) {
+                $db = Database::getInstance()->getConnection();
+                // Use prepared statement for safety
+                $stmt = $db->prepare("UPDATE users SET streak_count = :streak, last_login_at = :today WHERE id = :id");
+                $stmt->execute([
+                    'streak' => $newStreak,
+                    'today' => $today,
+                    'id' => $user['id']
+                ]);
                 
-                $streakUpdateSql = "";
-                $newStreak = $user['streak_count'];
-
-                if ($lastLogin == date('Y-m-d', strtotime('-1 day'))) {
-                    // Dün giriş yapmış, seriyi artır
-                    $newStreak++;
-                    $streakUpdateSql = "UPDATE users SET streak_count = streak_count + 1, last_login_at = '$today' WHERE id = " . $user['id'];
-                } elseif ($lastLogin != $today) {
-                    // Dün girmemiş (veya ilk kez giriyor), seriyi sıfırla (veya 1 yap)
-                    $newStreak = 1;
-                    $streakUpdateSql = "UPDATE users SET streak_count = 1, last_login_at = '$today' WHERE id = " . $user['id'];
-                }
-                
-                if ($streakUpdateSql) {
-                    $db = Database::getInstance()->getConnection();
-                    $db->query($streakUpdateSql);
-                    
-                    // 7 Günlük seri rozeti kontrolü (Opsiyonel)
-                    if ($newStreak == 7) {
-                        require_once __DIR__ . '/../Services/GamificationService.php';
+                // 7 Günlük seri rozeti kontrolü (Opsiyonel)
+                if ($newStreak == 7) {
+                    require_once __DIR__ . '/../Services/GamificationService.php';
+                    if (class_exists('GamificationService')) {
                         $gamification = new GamificationService();
-                        $gamification->awardBadge($user['id'], 'weekly-warrior'); // 'weekly-warrior' rozetini admin panelinden oluşturmalısınız
+                        $gamification->awardBadge($user['id'], 'weekly-warrior');
                     }
                 }
-                // --- GÜNLÜK SERİ MANTIĞI BİTİŞ ---
-
-                $this->redirect('/');
             }
-
+            // --- GÜNLÜK SERİ MANTIĞI BİTİŞ ---
 
             $this->redirect('/');
         } else {
