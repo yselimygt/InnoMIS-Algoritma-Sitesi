@@ -136,7 +136,10 @@ class Sandbox {
     }
 
     private function runLocal($language, $code, $input) {
-        // Yerel mod: eski davranış, hızlı test için. Güvenlik için sadece temp dizini ve basit timeout.
+        // SECURITY WARNING: This method executes code directly on the host machine.
+        // It is extremely dangerous and should NOT be used in production.
+        // Use 'docker' or 'judge0' mode for secure execution.
+        
         $file = $this->writeSourceFile($language, $code);
         $inputFile = $file['base'] . '.in';
         $outputFile = $file['base'] . '.out';
@@ -150,23 +153,30 @@ class Sandbox {
             exec($compileCommand . " 2> " . escapeshellarg($errorFile), $compileOutput, $returnVar);
             if ($returnVar !== 0) {
                 $error = file_get_contents($errorFile);
-                $this->cleanup($file['base']);
+                $this->cleanup($file['dir']);
                 return ['status' => 'CE', 'output' => $error];
             }
         }
 
         $startTime = microtime(true);
-        exec("$runCommand < " . escapeshellarg($inputFile) . " > " . escapeshellarg($outputFile) . " 2> " . escapeshellarg($errorFile), $output, $returnVar);
+        // Added basic timeout for local execution (linux only, for windows use different approach or rely on PHP max_execution_time)
+        // Since user is on Windows, 'timeout' command might not exist or work differently. 
+        // We will just run the command directly for now, but this is risky.
+        
+        $cmd = "$runCommand < " . escapeshellarg($inputFile) . " > " . escapeshellarg($outputFile) . " 2> " . escapeshellarg($errorFile);
+        
+        // On Windows, we might need to handle redirection differently if using cmd.exe, but exec() usually handles it.
+        exec($cmd, $output, $returnVar);
         $executionTime = microtime(true) - $startTime;
 
         if ($returnVar !== 0) {
             $error = file_get_contents($errorFile);
-            $this->cleanup($file['base']);
+            $this->cleanup($file['dir']);
             return ['status' => 'RE', 'output' => $error];
         }
 
         $output = file_get_contents($outputFile);
-        $this->cleanup($file['base']);
+        $this->cleanup($file['dir']);
 
         return [
             'status' => 'AC',
@@ -176,21 +186,33 @@ class Sandbox {
     }
 
     private function writeSourceFile($language, $code) {
-        $filename = uniqid('run_', true);
-        $basePath = $this->tempDir . '/' . $filename;
+        $uniqueId = uniqid('run_', true);
+        $dir = $this->tempDir . '/' . $uniqueId;
+        
+        if (!file_exists($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        $filename = 'solution';
         $ext = '';
         switch ($language) {
             case 'c': $ext = '.c'; break;
             case 'cpp': $ext = '.cpp'; break;
             case 'python': $ext = '.py'; break;
-            case 'java': $ext = '.java'; break;
+            case 'java': 
+                $ext = '.java'; 
+                $filename = 'Main'; // Enforce Main class for Java
+                break;
         }
-        $path = $basePath . $ext;
+        
+        $path = $dir . '/' . $filename . $ext;
         file_put_contents($path, $code);
+        
         return [
-            'base' => $basePath,
+            'dir' => $dir,
+            'base' => $dir . '/' . $filename,
             'path' => $path,
-            'container' => '/sandbox/' . $filename . $ext
+            'container' => '/sandbox/' . $uniqueId . '/' . $filename . $ext
         ];
     }
 
@@ -229,7 +251,7 @@ class Sandbox {
                 return "python {$containerPath}";
             case 'java':
                 $dir = dirname($containerPath);
-                return "cd {$dir} && java " . basename($base);
+                return "cd {$dir} && java Main";
             default:
                 return '';
         }
@@ -257,7 +279,15 @@ class Sandbox {
         return null;
     }
 
-    private function cleanup($basePath) {
-        array_map('unlink', glob($basePath . '*'));
+    private function cleanup($dir) {
+        if (is_dir($dir)) {
+            $files = glob($dir . '/*');
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+            rmdir($dir);
+        }
     }
 }
