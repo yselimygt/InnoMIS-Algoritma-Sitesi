@@ -6,8 +6,18 @@ define('DB_NAME', 'innomis_algo');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 
+/*
+define('DB_HOST', 'localhost'); // Burası genelde localhost kalır, değiştirmeyin.
+define('DB_NAME', 'innomis_algo'); // Hostinger'daki tam veritabanı adı
+define('DB_USER', 'admin');  // Hostinger'daki kullanıcı adı
+define('DB_PASS', '123456');          // Oluştururken girdiğiniz şifre
+*/
+
 // Application Configuration
 define('APP_URL', 'http://localhost/InnoMIS-Algoritma-Sitesi/public_html');
+
+/*web sitesinde kullanılacak url
+define('APP_URL', 'websitesi domaini');*/
 define('APP_NAME', 'InnoMIS Algoritma Platformu');
 
 // Sandbox Configuration
