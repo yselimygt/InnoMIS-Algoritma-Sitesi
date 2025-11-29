@@ -8,13 +8,17 @@ require_once __DIR__ . '/../Models/ForumModel.php';
 
 class AdminController extends Controller {
     
-    public function __construct() {
-        session_start();
+   public function __construct() {
+        // Oturum zaten başlatılmamışsa başlat
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             die("Access Denied");
         }
     }
-
+    
     public function index() {
         $stats = $this->getStats();
         $this->view('admin/dashboard', ['stats' => $stats]);
