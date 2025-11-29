@@ -112,6 +112,9 @@ $router->post('/admin/forum/delete', 'AdminController@deleteThread');
 $router->get('/profile', 'ProfileController@index');
 $router->get('/profile/{id}', 'ProfileController@show');
 
+// Daily Streak
+$router->get('/daily-streak', 'ProfileController@dailyStreak');
+
 // Follow actions
 $router->post('/follow', 'FollowController@follow');
 $router->post('/unfollow', 'FollowController@unfollow');

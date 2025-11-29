@@ -78,4 +78,18 @@ class ProfileController extends Controller
             'submissions' => $submissions
         ]);
     }
+
+    public function dailyStreak()
+    {
+        // Kullanıcı giriş yapmamışsa login'e at
+        if (!isset($_SESSION['user_id'])) {
+            $this->redirect('/login');
+        }
+        
+        $userId = (int) $_SESSION['user_id'];
+        $user = $this->userModel->findById($userId);
+
+        // Görünümü yükle
+        $this->view('profile/daily_streak', ['user' => $user]);
+    }
 }
