@@ -1,15 +1,33 @@
--- InnoMIS Algorithm Platform Database Schema
+-- InnoMIS Algorithm Platform - Full Schema
+-- This file recreates the entire database from scratch.
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
--- --------------------------------------------------------
+-- -------------------------------------------------------------------
+-- Cleanup existing tables
+-- -------------------------------------------------------------------
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS forum_comments;
+DROP TABLE IF EXISTS forum_threads;
+DROP TABLE IF EXISTS tournament_participants;
+DROP TABLE IF EXISTS tournaments;
+DROP TABLE IF EXISTS team_members;
+DROP TABLE IF EXISTS teams;
+DROP TABLE IF EXISTS user_path_progress;
+DROP TABLE IF EXISTS path_steps;
+DROP TABLE IF EXISTS learning_paths;
+DROP TABLE IF EXISTS user_badges;
+DROP TABLE IF EXISTS badges;
+DROP TABLE IF EXISTS submissions;
+DROP TABLE IF EXISTS test_cases;
+DROP TABLE IF EXISTS problems;
+DROP TABLE IF EXISTS users;
 
---
--- Table structure for table `users`
---
-
+-- -------------------------------------------------------------------
+-- users
+-- -------------------------------------------------------------------
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
@@ -32,12 +50,9 @@ CREATE TABLE `users` (
   UNIQUE KEY `student_number` (`student_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `problems`
---
-
+-- -------------------------------------------------------------------
+-- problems
+-- -------------------------------------------------------------------
 CREATE TABLE `problems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -53,12 +68,9 @@ CREATE TABLE `problems` (
   UNIQUE KEY `slug` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `test_cases`
---
-
+-- -------------------------------------------------------------------
+-- test_cases
+-- -------------------------------------------------------------------
 CREATE TABLE `test_cases` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `problem_id` int(11) NOT NULL,
@@ -71,12 +83,9 @@ CREATE TABLE `test_cases` (
   CONSTRAINT `fk_test_cases_problem` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `submissions`
---
-
+-- -------------------------------------------------------------------
+-- submissions
+-- -------------------------------------------------------------------
 CREATE TABLE `submissions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -94,15 +103,12 @@ CREATE TABLE `submissions` (
   CONSTRAINT `fk_submissions_problem` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `badges`
---
-
+-- -------------------------------------------------------------------
+-- badges
+-- -------------------------------------------------------------------
 CREATE TABLE `badges` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `slug` varchar(100) NOT NULL,
+  `slug` varchar(100) DEFAULT NULL,
   `name` varchar(100) NOT NULL,
   `description` text,
   `type` enum('system','community','event','season','special') DEFAULT 'system',
@@ -116,12 +122,9 @@ CREATE TABLE `badges` (
   UNIQUE KEY `slug` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `user_badges`
---
-
+-- -------------------------------------------------------------------
+-- user_badges
+-- -------------------------------------------------------------------
 CREATE TABLE `user_badges` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -136,12 +139,9 @@ CREATE TABLE `user_badges` (
   CONSTRAINT `fk_user_badges_badge` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `learning_paths`
---
-
+-- -------------------------------------------------------------------
+-- learning_paths
+-- -------------------------------------------------------------------
 CREATE TABLE `learning_paths` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -149,15 +149,14 @@ CREATE TABLE `learning_paths` (
   `level` enum('beginner','intermediate','advanced') NOT NULL,
   `badge_id` int(11) DEFAULT NULL,
   `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `badge_id` (`badge_id`),
+  CONSTRAINT `fk_lp_badge` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `path_steps`
---
-
+-- -------------------------------------------------------------------
+-- path_steps
+-- -------------------------------------------------------------------
 CREATE TABLE `path_steps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `path_id` int(11) NOT NULL,
@@ -170,12 +169,9 @@ CREATE TABLE `path_steps` (
   CONSTRAINT `fk_path_steps_problem` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `user_path_progress`
---
-
+-- -------------------------------------------------------------------
+-- user_path_progress
+-- -------------------------------------------------------------------
 CREATE TABLE `user_path_progress` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -190,12 +186,9 @@ CREATE TABLE `user_path_progress` (
   CONSTRAINT `fk_upp_path` FOREIGN KEY (`path_id`) REFERENCES `learning_paths` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `teams`
---
-
+-- -------------------------------------------------------------------
+-- teams
+-- -------------------------------------------------------------------
 CREATE TABLE `teams` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
@@ -210,12 +203,9 @@ CREATE TABLE `teams` (
   CONSTRAINT `fk_teams_leader` FOREIGN KEY (`leader_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `team_members`
---
-
+-- -------------------------------------------------------------------
+-- team_members
+-- -------------------------------------------------------------------
 CREATE TABLE `team_members` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `team_id` int(11) NOT NULL,
@@ -228,12 +218,9 @@ CREATE TABLE `team_members` (
   CONSTRAINT `fk_tm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tournaments`
---
-
+-- -------------------------------------------------------------------
+-- tournaments
+-- -------------------------------------------------------------------
 CREATE TABLE `tournaments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -245,12 +232,9 @@ CREATE TABLE `tournaments` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tournament_participants`
---
-
+-- -------------------------------------------------------------------
+-- tournament_participants
+-- -------------------------------------------------------------------
 CREATE TABLE `tournament_participants` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tournament_id` int(11) NOT NULL,
@@ -264,12 +248,9 @@ CREATE TABLE `tournament_participants` (
   CONSTRAINT `fk_tp_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `forum_threads`
---
-
+-- -------------------------------------------------------------------
+-- forum_threads
+-- -------------------------------------------------------------------
 CREATE TABLE `forum_threads` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -288,12 +269,9 @@ CREATE TABLE `forum_threads` (
   CONSTRAINT `fk_forum_threads_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `forum_comments`
---
-
+-- -------------------------------------------------------------------
+-- forum_comments
+-- -------------------------------------------------------------------
 CREATE TABLE `forum_comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `thread_id` int(11) NOT NULL,
@@ -311,12 +289,9 @@ CREATE TABLE `forum_comments` (
   CONSTRAINT `fk_forum_comments_parent` FOREIGN KEY (`parent_id`) REFERENCES `forum_comments` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `notifications`
---
-
+-- -------------------------------------------------------------------
+-- notifications
+-- -------------------------------------------------------------------
 CREATE TABLE `notifications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,

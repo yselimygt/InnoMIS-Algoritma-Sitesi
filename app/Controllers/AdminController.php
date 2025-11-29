@@ -102,7 +102,7 @@ class AdminController extends Controller {
         $iconPath = 'default_badge.png';
 
         if (isset($_FILES['icon']) && $_FILES['icon']['error'] == 0) {
-            $uploadDir = __DIR__ . '/../../public/uploads/badges/';
+            $uploadDir = __DIR__ . '/../../public_html/uploads/badges/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
             
             $fileName = uniqid() . '_' . basename($_FILES['icon']['name']);
