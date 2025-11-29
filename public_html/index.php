@@ -4,6 +4,48 @@ require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../core/Router.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Controller.php';
+require_once __DIR__ . '/../core/helpers.php';
+
+// Start session early so controllers/views can rely on it
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+// Simple CSRF enforcement:
+// - For JSON POST requests, expect header X-CSRF-Token
+// - For form POST requests, expect a hidden input named csrf_token
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+// Simple CSRF enforcement (configurable):
+// - For JSON POST requests, expect header X-CSRF-Token
+// - For form POST requests, expect a hidden input named csrf_token
+// Use config constants `ENFORCE_CSRF` and `CSRF_EXEMPT_PREFIXES` to control behavior.
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+
+$enforceCsrf = defined('ENFORCE_CSRF') ? ENFORCE_CSRF : true;
+$exemptPrefixes = defined('CSRF_EXEMPT_PREFIXES') ? CSRF_EXEMPT_PREFIXES : [];
+$isExempt = false;
+foreach ($exemptPrefixes as $prefix) {
+    if ($prefix !== '' && strpos($requestPath, $prefix) === 0) {
+        $isExempt = true;
+        break;
+    }
+}
+
+if ($method === 'POST' && $enforceCsrf && !$isExempt) {
+    if (stripos($contentType, 'application/json') !== false) {
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+    } else {
+        $token = $_POST['csrf_token'] ?? null;
+    }
+    if (!$token || !verify_csrf($token)) {
+        http_response_code(400);
+        echo "Invalid CSRF token";
+        exit;
+    }
+}
 
 $router = new Router();
 

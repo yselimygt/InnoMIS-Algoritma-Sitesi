@@ -22,3 +22,9 @@ ini_set('display_errors', 1);
 
 // Timezone
 date_default_timezone_set('Europe/Istanbul');
+
+// CSRF Enforcement
+// Set to false to disable global CSRF checks (not recommended)
+define('ENFORCE_CSRF', true);
+// Array of path prefixes to exempt from CSRF checking (e.g. API endpoints)
+define('CSRF_EXEMPT_PREFIXES', ['/api/']);
