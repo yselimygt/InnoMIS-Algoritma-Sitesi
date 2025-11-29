@@ -42,8 +42,7 @@
                                         <form action="<?= APP_URL ?>/<?= $alreadyFollowing ? 'unfollow' : 'follow' ?>" method="POST" style="display:inline-block;">
                                             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                            <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/leaderboard') ?>">
-                                            <button type="submit" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;">
+                                            <input type="hidden" name="redirect_to" value="/leaderboard">                                            <button type="submit" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;">
                                                 <?= $alreadyFollowing ? 'Takibi Bırak' : 'Takip Et' ?>
                                             </button>
                                         </form>

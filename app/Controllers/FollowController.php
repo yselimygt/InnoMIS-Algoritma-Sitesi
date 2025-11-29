@@ -67,9 +67,22 @@ class FollowController extends Controller
 
     private function sanitizeRedirect(?string $value, int $fallbackUserId): string
     {
-        if ($value && strpos($value, '/') === 0) {
-            return $value;
+        // Gelen değer dolu mu kontrol et
+        if ($value) {
+            // Eğer değer tam URL içeriyorsa (APP_URL), onu temizle
+            $basePath = parse_url(APP_URL, PHP_URL_PATH); // "/InnoMIS-Algoritma-Sitesi/public_html" kısmını alır
+            
+            // Eğer gelen değer base path ile başlıyorsa, o kısmı sil
+            if ($basePath && strpos($value, $basePath) === 0) {
+                $value = substr($value, strlen($basePath));
+            }
+            
+            // Sadece '/' ile başlıyorsa geçerli say
+            if (strpos($value, '/') === 0) {
+                return $value;
+            }
         }
+        
         return '/profile/' . $fallbackUserId;
     }
 }

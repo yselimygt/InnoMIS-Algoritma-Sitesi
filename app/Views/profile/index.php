@@ -91,8 +91,7 @@
                     <form action="<?= APP_URL ?>/<?= $isFollowing ? 'unfollow' : 'follow' ?>" method="POST">
                         <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                         <input type="hidden" name="user_id" value="<?= $profileUser['id'] ?>">
-                        <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/profile/' . $profileUser['id']) ?>">
-                        <button type="submit" class="btn" style="min-width: 160px;">
+                        <input type="hidden" name="redirect_to" value="/profile/<?= $profileUser['id'] ?>">                        <button type="submit" class="btn" style="min-width: 160px;">
                             <?= $isFollowing ? 'Takibi Bırak' : 'Takip Et' ?>
                         </button>
                     </form>
