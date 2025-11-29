@@ -119,6 +119,8 @@ $router->post('/unfollow', 'FollowController@unfollow');
 // Learning Paths
 $router->get('/paths', 'LearningPathController@index');
 $router->get('/path/{id}', 'LearningPathController@show');
+$router->post('/path/{id}/steps/toggle', 'LearningPathController@toggleStep');
+$router->post('/path/{id}/remind', 'LearningPathController@remind');
 
 // Teams
 $router->get('/teams', 'TeamController@index');

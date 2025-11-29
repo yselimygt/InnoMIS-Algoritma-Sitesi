@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS tournament_participants;
 DROP TABLE IF EXISTS tournaments;
 DROP TABLE IF EXISTS team_members;
 DROP TABLE IF EXISTS teams;
+DROP TABLE IF EXISTS user_path_step_progress;
 DROP TABLE IF EXISTS user_path_progress;
 DROP TABLE IF EXISTS path_steps;
 DROP TABLE IF EXISTS learning_paths;
@@ -194,10 +195,28 @@ CREATE TABLE `user_path_progress` (
   `is_completed` tinyint(1) DEFAULT 0,
   `last_updated` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_user_path` (`user_id`, `path_id`),
   KEY `user_id` (`user_id`),
   KEY `path_id` (`path_id`),
   CONSTRAINT `fk_upp_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_upp_path` FOREIGN KEY (`path_id`) REFERENCES `learning_paths` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------------------------------------------------
+-- user_path_step_progress
+-- -------------------------------------------------------------------
+CREATE TABLE `user_path_step_progress` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `path_id` int(11) NOT NULL,
+  `step_id` int(11) NOT NULL,
+  `completed_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_user_step` (`user_id`, `step_id`),
+  KEY `path_id` (`path_id`),
+  CONSTRAINT `fk_upsp_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_upsp_path` FOREIGN KEY (`path_id`) REFERENCES `learning_paths` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_upsp_step` FOREIGN KEY (`step_id`) REFERENCES `path_steps` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- -------------------------------------------------------------------

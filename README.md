@@ -30,3 +30,17 @@ Varsayılan yönetici hesabı:
 - **Backend:** PHP (MVC Yapısı)
 - **Veritabanı:** MySQL
 - **Frontend:** HTML, CSS, JavaScript
+
+## Ek Tablolar
+
+- **user_follows:** Kullanıcıların takip ettiği kullanıcılar ve takip edilen zaman.
+  - `id`: Tablonun anahtar numarası.
+  - `follower_id`: Takip eden kullanıcı ID'si.
+  - `followee_id`: Takip edilen kullanıcı ID'si.
+  - `created_at`: Takip edilme zamanı.
+  - **Kısıtlar:**
+    - `uniq_follow_pair`: `follower_id` ve `followee_id`'nin benzersiz olması.
+    - `followee_id`: `followee_id`'nin `users` tablosuna ait olması.
+  - **İlişkiler:**
+    - `fk_user_follows_follower`: `follower_id`'nin `users` tablosuna ait olması.
+    - `fk_user_follows_followee`: `followee_id`'nin `users` tablosuna ait olması.

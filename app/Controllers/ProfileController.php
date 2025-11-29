@@ -14,7 +14,9 @@ class ProfileController extends Controller
 
     public function __construct()
     {
-        session_start();
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
         $this->userModel = new UserModel();
         $this->badgeModel = new BadgeModel();
         $this->problemModel = new ProblemModel();

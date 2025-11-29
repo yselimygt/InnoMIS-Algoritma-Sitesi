@@ -2,9 +2,11 @@
 
 require_once __DIR__ . '/../Models/TeamModel.php';
 
-class TeamController extends Controller {
-    public function index() {
-        session_start();
+class TeamController extends Controller
+{
+    public function index()
+    {
+        $this->ensureSession();
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
         }
@@ -21,17 +23,19 @@ class TeamController extends Controller {
         }
     }
 
-    public function create() {
+    public function create()
+    {
         $this->view('teams/create');
     }
 
-    public function store() {
-        session_start();
+    public function store()
+    {
+        $this->ensureSession();
         $userId = $_SESSION['user_id'];
-        
+
         $name = $_POST['name'];
         $description = $_POST['description'];
-        
+
         $model = new TeamModel();
         if ($model->createTeam($name, $description, $userId)) {
             $this->redirect('/teams');
@@ -40,16 +44,24 @@ class TeamController extends Controller {
         }
     }
 
-    public function join() {
-        session_start();
+    public function join()
+    {
+        $this->ensureSession();
         $userId = $_SESSION['user_id'];
         $inviteCode = $_POST['invite_code'];
-        
+
         $model = new TeamModel();
         if ($model->joinTeam($inviteCode, $userId)) {
             $this->redirect('/teams');
         } else {
             die("Invalid invite code or already in a team");
+        }
+    }
+
+    private function ensureSession(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
         }
     }
 }

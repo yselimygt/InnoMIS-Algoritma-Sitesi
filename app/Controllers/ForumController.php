@@ -3,22 +3,28 @@
 require_once __DIR__ . '/../Models/ForumModel.php';
 require_once __DIR__ . '/../Models/NotificationModel.php';
 
-class ForumController extends Controller {
+class ForumController extends Controller
+{
     private $forumModel;
     private $notificationModel;
 
-    public function __construct() {
-        session_start();
+    public function __construct()
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
         $this->forumModel = new ForumModel();
         $this->notificationModel = new NotificationModel();
     }
 
-    public function index() {
+    public function index()
+    {
         $threads = $this->forumModel->getThreads(50, 0);
         $this->view('forum/index', ['threads' => $threads]);
     }
 
-    public function show($slug) {
+    public function show($slug)
+    {
         $thread = $this->forumModel->getThreadBySlug($slug);
         if (!$thread) {
             http_response_code(404);
@@ -28,12 +34,14 @@ class ForumController extends Controller {
         $this->view('forum/show', ['thread' => $thread, 'comments' => $comments]);
     }
 
-    public function create() {
+    public function create()
+    {
         $this->ensureAuth();
         $this->view('forum/create');
     }
 
-    public function store() {
+    public function store()
+    {
         $this->ensureAuth();
 
         $title = trim($_POST['title']);
@@ -44,7 +52,8 @@ class ForumController extends Controller {
         $this->redirect('/forum/' . $slug);
     }
 
-    public function comment($slug) {
+    public function comment($slug)
+    {
         $this->ensureAuth();
         $thread = $this->forumModel->getThreadBySlug($slug);
         if (!$thread) {
@@ -82,13 +91,15 @@ class ForumController extends Controller {
         $this->redirect('/forum/' . $slug);
     }
 
-    private function ensureAuth() {
+    private function ensureAuth()
+    {
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
         }
     }
 
-    private function slugify($text) {
+    private function slugify($text)
+    {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
         $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
         $text = preg_replace('~[^-\w]+~', '', $text);
