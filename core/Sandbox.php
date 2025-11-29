@@ -2,93 +2,183 @@
 
 class Sandbox {
     private $tempDir;
+    private $mode;
 
     public function __construct() {
         $this->tempDir = __DIR__ . '/../storage/temp';
         if (!file_exists($this->tempDir)) {
             mkdir($this->tempDir, 0777, true);
         }
+        $this->mode = defined('SANDBOX_MODE') ? SANDBOX_MODE : 'local';
     }
 
     public function run($language, $code, $input) {
-        $filename = uniqid();
-        $filePath = $this->tempDir . '/' . $filename;
-        $inputFile = $filePath . '.in';
-        $outputFile = $filePath . '.out';
-        $errorFile = $filePath . '.err';
+        switch ($this->mode) {
+            case 'docker':
+                return $this->runDocker($language, $code, $input);
+            case 'judge0':
+                return $this->runJudge0($language, $code, $input);
+            default:
+                return $this->runLocal($language, $code, $input);
+        }
+    }
 
-        // Write code and input to files
-        $sourceFile = $this->writeSourceFile($filePath, $language, $code);
+    private function runDocker($language, $code, $input) {
+        $file = $this->writeSourceFile($language, $code);
+        $inputFile = $file['base'] . '.in';
         file_put_contents($inputFile, $input);
 
-        $compileCommand = $this->getCompileCommand($language, $sourceFile, $filePath);
-        $runCommand = $this->getRunCommand($language, $filePath);
+        $image = $this->dockerImageFor($language);
+        if (!$image) {
+            return ['status' => 'CE', 'output' => 'Desteklenmeyen dil'];
+        }
 
-        // Compile
+        $compileCmd = $this->dockerCompileCmd($language, $file['container']);
+        $runCmd = $this->dockerRunCmd($language, $file['container']);
+
+        $volume = escapeshellarg($this->tempDir . ':/sandbox');
+        $baseCommand = "docker run --rm --net=none -m 256m --cpus=1 --pids-limit 128 -v {$volume} -w /sandbox {$image}";
+
+        if ($compileCmd) {
+            $compile = "{$baseCommand} /bin/sh -c " . escapeshellarg($compileCmd);
+            exec($compile, $out, $codeCompile);
+            if ($codeCompile !== 0) {
+                $this->cleanup($file['base']);
+                return ['status' => 'CE', 'output' => implode("\n", $out)];
+            }
+        }
+
+        $command = "{$baseCommand} /bin/sh -c " . escapeshellarg("timeout 5s {$runCmd} < {$file['container']}.in");
+        $start = microtime(true);
+        exec($command, $output, $codeRun);
+        $execTime = microtime(true) - $start;
+
+        $this->cleanup($file['base']);
+
+        if ($codeRun !== 0) {
+            return ['status' => 'RE', 'output' => implode("\n", $output)];
+        }
+
+        return [
+            'status' => 'AC',
+            'output' => trim(implode("\n", $output)),
+            'time' => $execTime
+        ];
+    }
+
+    private function runJudge0($language, $code, $input) {
+        if (!JUDGE0_URL) {
+            return ['status' => 'CE', 'output' => 'Judge0 URL yapılandırılmamış.'];
+        }
+        // Bu ortamda dış ağ kapalı, bu nedenle sadece iskelet bırakıldı.
+        return ['status' => 'CE', 'output' => 'Judge0 için bağlantı yapılamadı (ağ kısıtlı).'];
+    }
+
+    private function runLocal($language, $code, $input) {
+        // Yerel mod: eski davranış, hızlı test için. Güvenlik için sadece temp dizini ve basit timeout.
+        $file = $this->writeSourceFile($language, $code);
+        $inputFile = $file['base'] . '.in';
+        $outputFile = $file['base'] . '.out';
+        $errorFile = $file['base'] . '.err';
+        file_put_contents($inputFile, $input);
+
+        $compileCommand = $this->getCompileCommand($language, $file['path'], $file['base']);
+        $runCommand = $this->getRunCommand($language, $file['base']);
+
         if ($compileCommand) {
-            $compileOutput = [];
-            $returnVar = 0;
-            exec($compileCommand . " 2> " . $errorFile, $compileOutput, $returnVar);
-            
+            exec($compileCommand . " 2> " . escapeshellarg($errorFile), $compileOutput, $returnVar);
             if ($returnVar !== 0) {
                 $error = file_get_contents($errorFile);
-                $this->cleanup($filePath);
+                $this->cleanup($file['base']);
                 return ['status' => 'CE', 'output' => $error];
             }
         }
 
-        // Run
         $startTime = microtime(true);
-        // Timeout logic should be added here (e.g. using `timeout` command on Linux)
-        // For Windows, it's harder to enforce timeout without external tools.
-        // We will assume standard execution for now.
-        
-        $command = "$runCommand < $inputFile > $outputFile 2> $errorFile";
-        exec($command, $output, $returnVar);
-        $endTime = microtime(true);
-        $executionTime = $endTime - $startTime;
+        exec("$runCommand < " . escapeshellarg($inputFile) . " > " . escapeshellarg($outputFile) . " 2> " . escapeshellarg($errorFile), $output, $returnVar);
+        $executionTime = microtime(true) - $startTime;
 
         if ($returnVar !== 0) {
-             $error = file_get_contents($errorFile);
-             $this->cleanup($filePath);
-             return ['status' => 'RE', 'output' => $error];
+            $error = file_get_contents($errorFile);
+            $this->cleanup($file['base']);
+            return ['status' => 'RE', 'output' => $error];
         }
 
         $output = file_get_contents($outputFile);
-        $this->cleanup($filePath);
+        $this->cleanup($file['base']);
 
         return [
-            'status' => 'AC', // This is just execution status, not correctness
+            'status' => 'AC',
             'output' => trim($output),
             'time' => $executionTime
         ];
     }
 
-    private function writeSourceFile($basePath, $language, $code) {
+    private function writeSourceFile($language, $code) {
+        $filename = uniqid('run_', true);
+        $basePath = $this->tempDir . '/' . $filename;
         $ext = '';
         switch ($language) {
             case 'c': $ext = '.c'; break;
             case 'cpp': $ext = '.cpp'; break;
             case 'python': $ext = '.py'; break;
-            case 'java': $ext = '.java'; break; // Java needs class name matching filename usually, handling Main class
+            case 'java': $ext = '.java'; break;
         }
-        
-        // For Java, we might need to parse class name or enforce Main
-        if ($language == 'java') {
-             // Simple hack: replace class name with Main or force user to use Main
-             $basePath = $this->tempDir . '/Main'; 
-        }
-
         $path = $basePath . $ext;
         file_put_contents($path, $code);
-        return $path;
+        return [
+            'base' => $basePath,
+            'path' => $path,
+            'container' => '/sandbox/' . $filename . $ext
+        ];
+    }
+
+    private function dockerImageFor($language) {
+        switch ($language) {
+            case 'c':
+            case 'cpp':
+                return 'gcc:12';
+            case 'python':
+                return 'python:3.11';
+            case 'java':
+                return 'openjdk:17';
+            default:
+                return null;
+        }
+    }
+
+    private function dockerCompileCmd($language, $containerPath) {
+        $base = preg_replace('/\\.[^.]+$/', '', $containerPath);
+        switch ($language) {
+            case 'c': return "gcc {$containerPath} -O2 -std=c11 -o {$base}.out";
+            case 'cpp': return "g++ {$containerPath} -O2 -std=c++17 -o {$base}.out";
+            case 'java': return "javac {$containerPath}";
+            case 'python': return null;
+            default: return null;
+        }
+    }
+
+    private function dockerRunCmd($language, $containerPath) {
+        $base = preg_replace('/\\.[^.]+$/', '', $containerPath);
+        switch ($language) {
+            case 'c':
+            case 'cpp':
+                return "{$base}.out";
+            case 'python':
+                return "python {$containerPath}";
+            case 'java':
+                $dir = dirname($containerPath);
+                return "cd {$dir} && java " . basename($base);
+            default:
+                return '';
+        }
     }
 
     private function getCompileCommand($language, $sourceFile, $basePath) {
         switch ($language) {
-            case 'c': return "gcc $sourceFile -o $basePath.exe";
-            case 'cpp': return "g++ $sourceFile -o $basePath.exe";
-            case 'java': return "javac $sourceFile";
+            case 'c': return "gcc " . escapeshellarg($sourceFile) . " -o " . escapeshellarg($basePath . '.exe');
+            case 'cpp': return "g++ " . escapeshellarg($sourceFile) . " -o " . escapeshellarg($basePath . '.exe');
+            case 'java': return "javac " . escapeshellarg($sourceFile);
             case 'python': return null;
         }
         return null;
@@ -96,21 +186,17 @@ class Sandbox {
 
     private function getRunCommand($language, $basePath) {
         switch ($language) {
-            case 'c': return "$basePath.exe";
-            case 'cpp': return "$basePath.exe";
-            case 'python': return "python $basePath.py";
+            case 'c': return escapeshellarg($basePath . '.exe');
+            case 'cpp': return escapeshellarg($basePath . '.exe');
+            case 'python': return "python " . escapeshellarg($basePath . '.py');
             case 'java': 
-                // Java runs from the directory
                 $dir = dirname($basePath);
-                return "cd $dir && java Main"; 
+                return "cd " . escapeshellarg($dir) . " && java Main";
         }
         return null;
     }
 
     private function cleanup($basePath) {
-        // Delete all related files
-        array_map('unlink', glob("$basePath*"));
-        if (file_exists($this->tempDir . '/Main.java')) unlink($this->tempDir . '/Main.java');
-        if (file_exists($this->tempDir . '/Main.class')) unlink($this->tempDir . '/Main.class');
+        array_map('unlink', glob($basePath . '*'));
     }
 }

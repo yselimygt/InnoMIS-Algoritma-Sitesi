@@ -1,19 +1,20 @@
 <?php
 
 require_once __DIR__ . '/../Models/UserModel.php';
+require_once __DIR__ . '/../Models/NotificationModel.php';
 
 class GamificationService {
     private $db;
+    private $notificationModel;
 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
+        $this->notificationModel = new NotificationModel();
     }
 
     public function addXp($userId, $amount) {
         $userModel = new UserModel();
-        // We need to fetch current XP first, but UserModel doesn't have findById yet.
-        // Let's add a quick query here or assume we can update directly.
-        
+        // XP güncelle
         $sql = "UPDATE users SET xp = xp + :amount WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['amount' => $amount, 'id' => $userId]);
@@ -34,7 +35,14 @@ class GamificationService {
                 $updateStmt = $this->db->prepare($updateSql);
                 $updateStmt->execute(['level' => $newLevel, 'id' => $userId]);
                 
-                // Trigger Level Up Badge Check or Notification here
+                // Bildirim: seviye atlama
+                $this->notificationModel->create(
+                    $userId,
+                    'system',
+                    'Seviye Atlama',
+                    "Tebrikler! Seviye {$newLevel}'a ulaştın.",
+                    APP_URL . '/profile'
+                );
             }
         }
     }
@@ -50,6 +58,15 @@ class GamificationService {
                     SELECT :uid, id, NOW() FROM badges WHERE slug = :slug";
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['uid' => $userId, 'slug' => $badgeSlug]);
+
+            // Bildirim: rozet
+            $this->notificationModel->create(
+                $userId,
+                'badge',
+                'Yeni Rozet',
+                "Yeni bir rozet kazandın: {$badgeSlug}",
+                APP_URL . '/profile'
+            );
             return true;
         }
         return false;

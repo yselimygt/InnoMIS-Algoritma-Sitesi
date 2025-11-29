@@ -47,6 +47,10 @@ $router->get('/admin/tournaments', 'AdminController@manageTournaments');
 $router->get('/admin/tournaments/create', 'AdminController@createTournament');
 $router->post('/admin/tournaments/store', 'AdminController@storeTournament');
 
+// Admin Forum
+$router->get('/admin/forum', 'AdminController@forumThreads');
+$router->post('/admin/forum/toggle', 'AdminController@toggleThread');
+
 // Profile
 $router->get('/profile', 'ProfileController@index');
 
@@ -64,6 +68,17 @@ $router->post('/teams/join', 'TeamController@join');
 $router->get('/tournaments', 'TournamentController@index');
 $router->get('/tournament/{id}', 'TournamentController@show');
 $router->post('/tournaments/join', 'TournamentController@join');
+
+// Forum
+$router->get('/forum', 'ForumController@index');
+$router->get('/forum/olustur', 'ForumController@create');
+$router->post('/forum', 'ForumController@store');
+$router->get('/forum/{slug}', 'ForumController@show');
+$router->post('/forum/{slug}/yorum', 'ForumController@comment');
+
+// Notifications
+$router->post('/api/notifications/read', 'NotificationController@markRead');
+$router->post('/api/notifications/read-all', 'NotificationController@markAll');
 
 // Run Router
 $router->resolve();

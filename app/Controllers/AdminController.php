@@ -2,11 +2,13 @@
 
 require_once __DIR__ . '/../Models/ProblemModel.php';
 require_once __DIR__ . '/../Models/BadgeModel.php';
+require_once __DIR__ . '/../Models/UserModel.php';
+require_once __DIR__ . '/../Models/TournamentModel.php';
+require_once __DIR__ . '/../Models/ForumModel.php';
 
 class AdminController extends Controller {
     
     public function __construct() {
-        // Simple Admin Check
         session_start();
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             die("Access Denied");
@@ -14,51 +16,23 @@ class AdminController extends Controller {
     }
 
     public function index() {
-        $this->view('admin/dashboard');
+        $stats = $this->getStats();
+        $this->view('admin/dashboard', ['stats' => $stats]);
+    }
+
+    private function getStats() {
+        $db = Database::getInstance()->getConnection();
+        $counts = [];
+        $counts['users'] = $db->query("SELECT COUNT(*) AS c FROM users")->fetch()['c'];
+        $counts['problems'] = $db->query("SELECT COUNT(*) AS c FROM problems")->fetch()['c'];
+        $counts['submissions'] = $db->query("SELECT COUNT(*) AS c FROM submissions")->fetch()['c'];
+        $counts['threads'] = $db->query("SELECT COUNT(*) AS c FROM forum_threads")->fetch()['c'];
+        return $counts;
     }
 
     public function problems() {
         $model = new ProblemModel();
-        $problems = $model->getAll(); // Should probably be a different method fetching all including inactive
-        $this->view('admin/problems/index', ['problems' => $problems]);
-    }
-
-    public function createProblem() {
-        $this->view('admin/problems/create');
-    }
-
-    public function storeProblem() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/admin/problems/create');
-        }
-
-        $problemData = [
-            'title' => $_POST['title'],
-            'slug' => $_POST['slug'],
-            'description' => $_POST['description'],
-<?php
-
-require_once __DIR__ . '/../Models/ProblemModel.php';
-require_once __DIR__ . '/../Models/BadgeModel.php';
-require_once __DIR__ . '/../Models/UserModel.php'; // Added for UserModel
-
-class AdminController extends Controller {
-    
-    public function __construct() {
-        // Simple Admin Check
-        session_start();
-        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-            die("Access Denied");
-        }
-    }
-
-    public function index() {
-        $this->view('admin/dashboard');
-    }
-
-    public function problems() {
-        $model = new ProblemModel();
-        $problems = $model->getAll(); // Should probably be a different method fetching all including inactive
+        $problems = $model->getAll();
         $this->view('admin/problems/index', ['problems' => $problems]);
     }
 
@@ -92,8 +66,7 @@ class AdminController extends Controller {
             }
             $this->redirect('/admin/problems');
         } else {
-            // Handle error (e.g. slug exists)
-            die("Error creating problem. Slug might be duplicate.");
+            die("Problem oluşturulamadı. Slug çakışıyor olabilir.");
         }
     }
 
@@ -126,9 +99,8 @@ class AdminController extends Controller {
     public function storeBadge() {
         $name = $_POST['name'];
         $description = $_POST['description'];
-        $iconPath = 'default_badge.png'; // Simplify for now, or handle upload
+        $iconPath = 'default_badge.png';
 
-        // Handle File Upload
         if (isset($_FILES['icon']) && $_FILES['icon']['error'] == 0) {
             $uploadDir = __DIR__ . '/../../public/uploads/badges/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
@@ -146,7 +118,6 @@ class AdminController extends Controller {
     }
 
     public function manageTournaments() {
-        require_once __DIR__ . '/../Models/TournamentModel.php';
         $model = new TournamentModel();
         $tournaments = $model->getAll();
         $this->view('admin/tournaments/index', ['tournaments' => $tournaments]);
@@ -157,7 +128,6 @@ class AdminController extends Controller {
     }
 
     public function storeTournament() {
-        require_once __DIR__ . '/../Models/TournamentModel.php';
         $title = $_POST['title'];
         $description = $_POST['description'];
         $startTime = $_POST['start_time'];
@@ -167,5 +137,19 @@ class AdminController extends Controller {
         $model->create($title, $description, $startTime, $endTime);
         
         $this->redirect('/admin/tournaments');
+    }
+
+    public function forumThreads() {
+        $forum = new ForumModel();
+        $threads = $forum->getAllThreadsForAdmin();
+        $this->view('admin/forum/index', ['threads' => $threads]);
+    }
+
+    public function toggleThread() {
+        $threadId = $_POST['thread_id'];
+        $hide = isset($_POST['hide']) ? (bool)$_POST['hide'] : false;
+        $forum = new ForumModel();
+        $forum->setThreadVisibility($threadId, $hide);
+        $this->redirect('/admin/forum');
     }
 }

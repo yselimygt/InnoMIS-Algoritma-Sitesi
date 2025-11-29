@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../Models/TournamentModel.php';
+require_once __DIR__ . '/../Models/NotificationModel.php';
 
 class TournamentController extends Controller {
     public function index() {
@@ -28,6 +29,15 @@ class TournamentController extends Controller {
 
         $model = new TournamentModel();
         if ($model->joinTournament($tournamentId, $userId)) {
+            // Bildirim: turnuvaya kayıt
+            $notif = new NotificationModel();
+            $notif->create(
+                $userId,
+                'tournament',
+                'Turnuva kaydın tamamlandı',
+                'Turnuvaya başarıyla katıldın. Başlangıç zamanı geldiğinde tekrar kontrol et.',
+                APP_URL . "/tournament/{$tournamentId}"
+            );
             $this->redirect("/tournament/$tournamentId");
         } else {
             die("Could not join tournament (maybe already joined or full)");
